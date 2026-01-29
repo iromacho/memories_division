@@ -31,7 +31,7 @@ export const products = [
     name: "Memory Beanie",
     price: 30,
     category: "accessories",
-    image: "https://images.unsplash.com/photo-1576871333021-d5d2bc33679d?q=80&w=1000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1633810543462-77c4a3b13f07?q=80&w=464&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     description: "Soft knit beanie with embroidered brand division patch. One size fits all.",
     sizes: ["OS"]
   },
