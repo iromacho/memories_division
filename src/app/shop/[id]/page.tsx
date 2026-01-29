@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { products } from "@/lib/data/products";
+import { getProductById, type Product } from "@/lib/data/products";
 import { useCart } from "@/context/CartContext";
 import { ChevronLeft, ShoppingBag, Plus, Minus, Info, Truck, RotateCcw, Heart } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -13,13 +13,34 @@ import { useWishlist } from "@/context/WishlistContext";
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const product = products.find((p) => p.id === id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const { addToCart } = useCart();
   const { t, formatPrice } = useSettings();
   const { toggleWishlist, isInWishlist } = useWishlist();
   
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || "");
+  const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    async function loadProduct() {
+      setIsLoading(true);
+      const data = await getProductById(id);
+      setProduct(data);
+      if (data?.sizes?.[0]) setSelectedSize(data.sizes[0]);
+      setIsLoading(false);
+    }
+    loadProduct();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!product) {
     notFound();

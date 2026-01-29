@@ -1,12 +1,33 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { collections } from "@/lib/data/products";
+import { getCollections, type Collection } from "@/lib/data/products";
 import { ArrowRight } from "lucide-react";
 
 export default function CollectionsPage() {
+  const [allCollections, setAllCollections] = useState<Collection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCollections() {
+      setIsLoading(true);
+      const data = await getCollections();
+      setAllCollections(data);
+      setIsLoading(false);
+    }
+    loadCollections();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
   return (
     <div className="pt-32 pb-24">
       <div className="container mx-auto px-6">
@@ -16,7 +37,7 @@ export default function CollectionsPage() {
         </header>
 
         <div className="space-y-32">
-          {collections.map((collection, idx) => (
+          {allCollections.map((collection, idx) => (
             <motion.div
               key={collection.id}
               initial={{ opacity: 0, y: 50 }}

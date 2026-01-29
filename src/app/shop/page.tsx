@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { products } from "@/lib/data/products";
+import { getProducts, type Product } from "@/lib/data/products";
 import { Filter, ChevronDown, Search } from "lucide-react";
 import { useSettings } from "@/context/SettingsContext";
 import { ProductCard } from "@/components/ui/ProductCard";
@@ -16,10 +16,22 @@ function ShopPageContent() {
   const searchParams = useSearchParams();
   const { t } = useSettings();
   
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSortOpen, setIsSortOpen] = useState(false);
+
+  useEffect(() => {
+    async function loadProducts() {
+      setIsLoading(true);
+      const data = await getProducts();
+      setAllProducts(data);
+      setIsLoading(false);
+    }
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     const category = searchParams.get("category");
@@ -31,7 +43,7 @@ function ShopPageContent() {
   const categories = ["all", "t-shirts", "hoodies", "pants", "shoes", "outerwear", "accessories"];
 
   const filteredAndSortedProducts = useMemo(() => {
-    let result = [...products];
+    let result = [...allProducts];
 
     // Category Filter
     if (selectedCategory !== "all") {
@@ -155,7 +167,13 @@ function ShopPageContent() {
         </div>
 
         {/* Product Grid */}
-        {filteredAndSortedProducts.length > 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-24">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] bg-accent animate-pulse" />
+            ))}
+          </div>
+        ) : filteredAndSortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-24">
             <AnimatePresence mode="popLayout">
               {filteredAndSortedProducts.map((product) => (

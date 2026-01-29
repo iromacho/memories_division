@@ -2,12 +2,29 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { products, collections } from "@/lib/data/products";
+import { getProducts, getCollections, type Product, type Collection } from "@/lib/data/products";
 
 export default function Home() {
-  const featuredProducts = products.slice(0, 3);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [allCollections, setAllCollections] = useState<Collection[]>([]);
+
+  useEffect(() => {
+    async function loadData() {
+      const [productsData, collectionsData] = await Promise.all([
+        getProducts(),
+        getCollections()
+      ]);
+      
+      const featured = productsData.filter(p => p.isFeatured);
+      // Fallback to latest products if no featured products found
+      setFeaturedProducts(featured.length > 0 ? featured.slice(0, 3) : productsData.slice(0, 3));
+      setAllCollections(collectionsData);
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -83,10 +100,11 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {collections.map((collection, idx) => (
-              <motion.div
-                key={collection.id}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {allCollections.map((collection, idx) => (
+                <motion.div
+                  key={collection.id}
+
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: idx * 0.2 }}
@@ -115,7 +133,25 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Categories Quick Links */}
+      <section className="py-12 bg-background border-y border-accent">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+            {["t-shirts", "hoodies", "pants", "accessories"].map((cat) => (
+              <Link
+                key={cat}
+                href={`/shop?category=${cat}`}
+                className="text-[10px] font-black uppercase tracking-[0.3em] hover:text-brand transition-colors px-4 py-2"
+              >
+                {cat}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Featured Products */}
+
       <section className="py-24 bg-accent/50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
