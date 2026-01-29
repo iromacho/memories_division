@@ -77,7 +77,7 @@ function ShopPageContent() {
     }
 
     return result;
-  }, [selectedCategory, sortBy, searchQuery]);
+    }, [allProducts, selectedCategory, sortBy, searchQuery]);
 
   return (
     <div className="pt-32 pb-24 min-h-screen bg-background">
