@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -8,12 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { products } from "@/lib/data/products";
 import { Filter, ChevronDown, Search } from "lucide-react";
 import { useSettings } from "@/context/SettingsContext";
+import { ProductCard } from "@/components/ui/ProductCard";
 
 type SortOption = "featured" | "newest" | "price-low" | "price-high";
 
-import { ProductCard } from "@/components/ui/ProductCard";
-
-export default function Shop() {
+function ShopPageContent() {
   const searchParams = useSearchParams();
   const { t } = useSettings();
   
@@ -185,5 +184,17 @@ export default function Shop() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Shop() {
+  return (
+    <Suspense fallback={
+      <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <ShopPageContent />
+    </Suspense>
   );
 }
