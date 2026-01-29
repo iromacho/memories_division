@@ -37,6 +37,15 @@ export const products = [
   },
   {
     id: "5",
+    name: "Pulsera memory",
+    price: 10,
+    category: "accessories",
+    image: "https://whiteandyou.com/cdn/shop/files/Pulseradeaceroconfotoproyectablepersonalizada.jpg?v=1747922328&width=1024",
+    description: "Soft knit beanie with embroidered brand division patch. One size fits all.",
+    sizes: ["OS"]
+  },
+  {
+    id: "6",
     name: "Signature Box Logo Tee",
     price: 50,
     category: "t-shirts",
@@ -45,7 +54,7 @@ export const products = [
     sizes: ["S", "M", "L", "XL"]
   },
   {
-    id: "6",
+    id: "7",
     name: "Abstract Graphic Hoodie",
     price: 95,
     category: "hoodies",
