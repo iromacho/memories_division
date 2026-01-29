@@ -162,6 +162,44 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1576905341939-402d242748d1?q=80&w=1000&auto=format&fit=crop",
     description: "Distressed black denim jacket with custom metal buttons and interior print.",
     sizes: ["S", "M", "L", "XL"]
+  },
+  {
+    id: "17",
+    name: "Cyber Punk Boots",
+    price: 280,
+    category: "shoes",
+    image: "https://images.unsplash.com/photo-1605733513597-a8f8d410fe3c?q=80&w=1000&auto=format&fit=crop",
+    description: "Futuristic boots with reinforced structure and tech-fabric overlays.",
+    sizes: ["7", "8", "9", "10", "11", "12"],
+    isNew: true
+  },
+  {
+    id: "18",
+    name: "Utility Chest Rig",
+    price: 90,
+    category: "accessories",
+    image: "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?q=80&w=1000&auto=format&fit=crop",
+    description: "Tactical chest rig for urban exploration. Modular attachment points.",
+    sizes: ["OS"]
+  },
+  {
+    id: "19",
+    name: "Division Sweatshorts",
+    price: 55,
+    category: "pants",
+    image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=1000&auto=format&fit=crop",
+    description: "Heavyweight jersey sweatshorts with raw hems and elastic waistband.",
+    sizes: ["S", "M", "L", "XL"]
+  },
+  {
+    id: "20",
+    name: "Division Logo Cap",
+    price: 35,
+    category: "accessories",
+    image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=1000&auto=format&fit=crop",
+    description: "Classic 6-panel cap with high-density logo embroidery and metal adjuster.",
+    sizes: ["OS"],
+    isFeatured: true
   }
 ];
 
