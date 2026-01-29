@@ -1,60 +1,110 @@
+"use client";
+
 import Link from "next/link";
+import { useSettings } from "@/context/SettingsContext";
+import { Globe, Coins } from "lucide-react";
 
 export const Footer = () => {
+  const { language, setLanguage, currency, setCurrency, t } = useSettings();
+
   return (
-    <footer className="bg-background border-t py-12 lg:py-20">
+    <footer className="bg-background border-t py-12 lg:py-24">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          <div className="space-y-6">
-            <Link href="/" className="text-xl font-bold tracking-[0.2em] uppercase">
-              Memories Division
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
+          <div className="space-y-8">
+            <Link href="/" className="flex flex-col group w-fit">
+              <div className="text-4xl font-black tracking-tighter leading-none group-hover:scale-105 transition-transform">
+                M
+              </div>
+              <div className="text-[8px] font-bold tracking-[0.4em] uppercase mt-2">
+                Division
+              </div>
             </Link>
-            <p className="text-zinc-500 max-w-xs">
+            <p className="text-zinc-500 text-xs uppercase tracking-[0.2em] leading-loose max-w-xs">
               Streetwear inspired by moments, curated for the modern individual. Minimalist aesthetics, premium quality.
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-widest mb-6">Shop</h4>
-            <ul className="space-y-4 text-zinc-500">
-              <li><Link href="/shop?category=t-shirts" className="hover:text-brand transition-colors">T-Shirts</Link></li>
-              <li><Link href="/shop?category=hoodies" className="hover:text-brand transition-colors">Hoodies</Link></li>
-              <li><Link href="/shop?category=pants" className="hover:text-brand transition-colors">Pants</Link></li>
-              <li><Link href="/shop?category=accessories" className="hover:text-brand transition-colors">Accessories</Link></li>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] mb-10 text-zinc-400">{t("nav.shop")}</h4>
+            <ul className="space-y-6 text-[10px] font-bold uppercase tracking-widest">
+              <li><Link href="/shop?category=t-shirts" className="hover:text-brand transition-colors">{t("shop.tshirts")}</Link></li>
+              <li><Link href="/shop?category=hoodies" className="hover:text-brand transition-colors">{t("shop.hoodies")}</Link></li>
+              <li><Link href="/shop?category=pants" className="hover:text-brand transition-colors">{t("shop.pants")}</Link></li>
+              <li><Link href="/shop?category=shoes" className="hover:text-brand transition-colors">{t("shop.shoes")}</Link></li>
+              <li><Link href="/shop?category=accessories" className="hover:text-brand transition-colors">{t("shop.accessories")}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-widest mb-6">Company</h4>
-            <ul className="space-y-4 text-zinc-500">
-              <li><Link href="/about" className="hover:text-brand transition-colors">Our Story</Link></li>
-              <li><Link href="/collections" className="hover:text-brand transition-colors">Collections</Link></li>
-              <li><Link href="/contact" className="hover:text-brand transition-colors">Contact</Link></li>
-              <li><Link href="/faq" className="hover:text-brand transition-colors">FAQ</Link></li>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] mb-10 text-zinc-400">Division</h4>
+            <ul className="space-y-6 text-[10px] font-bold uppercase tracking-widest">
+              <li><Link href="/about" className="hover:text-brand transition-colors">{t("nav.about")}</Link></li>
+              <li><Link href="/collections" className="hover:text-brand transition-colors">{t("nav.collections")}</Link></li>
+              <li><Link href="/stores" className="hover:text-brand transition-colors">{t("nav.stores")}</Link></li>
+              <li><Link href="/contact" className="hover:text-brand transition-colors">{t("nav.contact")}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-widest mb-6">Newsletter</h4>
-            <p className="text-zinc-500 mb-6">Join the division for exclusive drops and updates.</p>
-            <form className="flex gap-2">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] mb-10 text-zinc-400">{t("footer.newsletter")}</h4>
+            <p className="text-zinc-500 text-[10px] uppercase tracking-widest leading-loose mb-8">
+              {t("footer.newsletter_desc")}
+            </p>
+            <form className="flex flex-col gap-4">
               <input
                 type="email"
-                placeholder="Email address"
-                className="bg-accent border-none px-4 py-2 w-full focus:ring-1 focus:ring-brand outline-none transition-all"
+                placeholder={t("footer.email_placeholder")}
+                className="bg-accent border-none px-6 py-4 text-[10px] font-bold uppercase tracking-widest w-full focus:ring-1 focus:ring-brand outline-none transition-all"
               />
-              <button className="bg-foreground text-background px-6 py-2 font-bold uppercase text-xs tracking-widest hover:bg-brand transition-colors">
-                Join
+              <button className="bg-foreground text-background px-8 py-4 font-black uppercase text-[10px] tracking-[0.3em] hover:bg-brand transition-colors">
+                {t("footer.subscribe")}
               </button>
             </form>
           </div>
         </div>
 
-        <div className="mt-20 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-zinc-500 uppercase tracking-widest">
-          <p>© 2026 Memories Division. All rights reserved.</p>
-          <div className="flex gap-8">
-            <Link href="/privacy" className="hover:text-brand transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-brand transition-colors">Terms of Service</Link>
+        <div className="mt-24 pt-12 border-t flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+            <p className="text-[8px] text-zinc-500 uppercase tracking-[0.2em]">
+              © 2026 Memories Division. {t("footer.rights")}.
+            </p>
+            <div className="flex gap-8 text-[8px] text-zinc-500 uppercase tracking-[0.2em] font-bold">
+              <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            </div>
+          </div>
+
+          {/* Footer Settings */}
+          <div className="flex items-center gap-12 border-t md:border-t-0 pt-8 md:pt-0 w-full md:w-auto">
+            <div className="flex flex-col gap-2">
+              <span className="text-[8px] text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-2">
+                <Globe className="w-3 h-3" /> Language
+              </span>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as any)}
+                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border-none p-0 focus:ring-0"
+              >
+                <option value="en">English (US)</option>
+                <option value="es">Español (ES)</option>
+                <option value="jp">日本語 (JP)</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-[8px] text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-2">
+                <Coins className="w-3 h-3" /> Currency
+              </span>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as any)}
+                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border-none p-0 focus:ring-0"
+              >
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="JPY">JPY (¥)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>

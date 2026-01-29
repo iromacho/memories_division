@@ -1,63 +1,130 @@
-export const products = [
-  // T-SHIRTS (1-15)
-  { "id": "1", "name": "Division Oversized Tee", "price": 45, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Premium cotton oversized t-shirt with signature brand logo on the chest.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "2", "name": "Boxy Essential Tee", "price": 40, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Corte cuadrado en algodón pesado de 240 GSM.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "3", "name": "Acid Wash Tee", "price": 48, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Efecto vintage con lavado al ácido.", "sizes": ["M", "L", "XL"] },
-  { "id": "4", "name": "Graphic Orbit Tee", "price": 50, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Estampado serigrafiado con diseño futurista.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "5", "name": "Raw Edge Tee", "price": 42, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Acabado de cuello deshilachado.", "sizes": ["S", "M", "L"] },
-  { "id": "6", "name": "Mock Neck Tee", "price": 45, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Cuello semialto y hombros caídos.", "sizes": ["M", "L", "XL"] },
-  { "id": "7", "name": "Heavyweight Blank", "price": 38, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Básico premium sin logos.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "8", "name": "Logo Pocket Tee", "price": 45, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Bolsillo frontal con etiqueta tejida.", "sizes": ["S", "M", "L"] },
-  { "id": "9", "name": "Distressed Tee", "price": 55, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Detalles de roturas manuales.", "sizes": ["M", "L", "XL"] },
-  { "id": "10", "name": "Earth Tone Tee", "price": 40, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Color arena teñido en prenda.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "11", "name": "Vertical Stripe Tee", "price": 46, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Rayas verticales tejidas.", "sizes": ["M", "L", "XL"] },
-  { "id": "12", "name": "Contrast Stitch Tee", "price": 44, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Costuras en contraste blanco.", "sizes": ["S", "M", "L"] },
-  { "id": "13", "name": "Logo Repeat Tee", "price": 48, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Patrón de logos repetidos.", "sizes": ["M", "L", "XL"] },
-  { "id": "14", "name": "Mesh Panel Tee", "price": 52, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Paneles de malla laterales.", "sizes": ["S", "M", "L"] },
-  { "id": "15", "name": "Oversized V-Neck", "price": 40, "category": "t-shirts", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Cuello en V relajado.", "sizes": ["M", "L", "XL"] },
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string;
+  description: string;
+  sizes: string[];
+  isNew?: boolean;
+  isFeatured?: boolean;
+}
 
-  // HOODIES (16-30)
-  { "id": "16", "name": "Core Logo Hoodie", "price": 85, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Felpa francesa con capucha cruzada.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "17", "name": "Zip-Up Tech Hoodie", "price": 95, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Cierre de cremallera termosellada.", "sizes": ["M", "L", "XL"] },
-  { "id": "18", "name": "Crop Street Hoodie", "price": 75, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Corte corto con cintura ajustable.", "sizes": ["S", "M", "L"] },
-  { "id": "19", "name": "Signature Embroidery", "price": 90, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Logo bordado en el pecho.", "sizes": ["M", "L", "XL"] },
-  { "id": "20", "name": "Thermal Layer Hoodie", "price": 110, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Forro interior térmico.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "21", "name": "Backprint Hoodie", "price": 88, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Gráfico de gran tamaño en la espalda.", "sizes": ["L", "XL"] },
-  { "id": "22", "name": "Washed Grey Hoodie", "price": 82, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Efecto desgastado en gris carbón.", "sizes": ["S", "M", "L"] },
-  { "id": "23", "name": "Neon Accents Hoodie", "price": 89, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Detalles reflectantes en neón.", "sizes": ["M", "L", "XL"] },
-  { "id": "24", "name": "Boxy Fleece Hoodie", "price": 92, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Tejido polar de alto gramaje.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "25", "name": "Sleeveless Hoodie", "price": 65, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Diseño sin mangas urbano.", "sizes": ["M", "L", "XL"] },
-  { "id": "26", "name": "Panelled Hoodie", "price": 98, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Bloques de color asimétricos.", "sizes": ["S", "M", "L"] },
-  { "id": "27", "name": "Velour Luxe Hoodie", "price": 120, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Terciopelo premium con herrajes.", "sizes": ["M", "L"] },
-  { "id": "28", "name": "Artisanal Dye Hoodie", "price": 105, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Teñido a mano artesanal.", "sizes": ["L", "XL"] },
-  { "id": "29", "name": "Utility Pocket Hoodie", "price": 94, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Bolsillo tipo cargo en la manga.", "sizes": ["S", "M", "L", "XL"] },
-  { "id": "30", "name": "Minimalist Hoodie", "price": 78, "category": "hoodies", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Sin cordones, máxima pureza.", "sizes": ["M", "L", "XL"] },
-
-  // PANTS (31-45)
-  { "id": "31", "name": "Cargo Tech Pants", "price": 95, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "6 bolsillos y correas ajustables.", "sizes": ["30", "32", "34"] },
-  { "id": "32", "name": "Relaxed Sweatpants", "price": 70, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Joggers de algodón con bajos elásticos.", "sizes": ["S", "M", "L"] },
-  { "id": "33", "name": "Wide Leg Trousers", "price": 85, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Corte ancho estilo skater.", "sizes": ["30", "32", "34"] },
-  { "id": "34", "name": "Nylon Track Pants", "price": 80, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Nylon crujiente con forro de malla.", "sizes": ["M", "L", "XL"] },
-  { "id": "35", "name": "Distressed Denim", "price": 110, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Vaqueros rectos desgarrados.", "sizes": ["30", "32", "34"] },
-  { "id": "36", "name": "Utility Carpenter", "price": 90, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Lona de alta resistencia.", "sizes": ["32", "34", "36"] },
-  { "id": "37", "name": "Velvet Flare Pants", "price": 105, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Corte acampanado de terciopelo.", "sizes": ["S", "M", "L"] },
-  { "id": "38", "name": "Reflective Joggers", "price": 88, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Rayas laterales reflectantes.", "sizes": ["M", "L", "XL"] },
-  { "id": "39", "name": "Patchwork Cargo", "price": 125, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Combinación de telas camuflaje.", "sizes": ["32", "34"] },
-  { "id": "40", "name": "Short Mesh Shorts", "price": 55, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Pantalón corto baloncesto.", "sizes": ["S", "M", "L"] },
-  { "id": "41", "name": "Corduroy Chinos", "price": 82, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Pana fina color chocolate.", "sizes": ["30", "32", "34"] },
-  { "id": "42", "name": "Fleece Flare Pants", "price": 75, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Comodidad con corte pasarela.", "sizes": ["S", "M", "L"] },
-  { "id": "43", "name": "Side Button Track", "price": 89, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Botones de presión laterales.", "sizes": ["M", "L", "XL"] },
-  { "id": "44", "name": "Tailored Street Pant", "price": 130, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Mezcla de lana con pinzas.", "sizes": ["32", "34"] },
-  { "id": "45", "name": "Acid Wash Shorts", "price": 60, "category": "pants", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Shorts felpa bordes vivos.", "sizes": ["S", "M", "L"] },
-
-  // ACCESORIES (46-50)
-  { "id": "46", "name": "Logo Trucker Cap", "price": 35, "category": "accesories", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Gorra con bordado 3D.", "sizes": ["One Size"] },
-  { "id": "47", "name": "Crossbody Tech Bag", "price": 55, "category": "accesories", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Bolso hombro compacto.", "sizes": ["One Size"] },
-  { "id": "48", "name": "Beanie Signature", "price": 30, "category": "accesories", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Gorro punto acanalado.", "sizes": ["One Size"] },
-  { "id": "49", "name": "Industrial Belt", "price": 45, "category": "accesories", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Cinturón nylon hebilla metal.", "sizes": ["One Size"] },
-  { "id": "50", "name": "Chain Link Necklace", "price": 65, "category": "accesories", "image": "https://www.gammaracionero.es/wp-content/uploads/2016/09/placeholder-800x600.png", "description": "Cadena acero inoxidable.", "sizes": ["One Size"] }
-  
-
+export const products: Product[] = [
+  {
+    id: "1",
+    name: "Division Oversized Tee",
+    price: 45,
+    category: "t-shirts",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1000&auto=format&fit=crop",
+    description: "Premium cotton oversized t-shirt with signature brand logo on the chest. Relaxed fit for ultimate comfort.",
+    sizes: ["S", "M", "L", "XL"],
+    isFeatured: true
+  },
+  {
+    id: "2",
+    name: "Momentum Hoodie",
+    price: 85,
+    category: "hoodies",
+    image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop",
+    description: "Heavyweight fleece hoodie with dropped shoulders and a minimalist aesthetic. Perfect for layering.",
+    sizes: ["S", "M", "L", "XL"],
+    isNew: true
+  },
+  {
+    id: "3",
+    name: "Urban Cargo Pants",
+    price: 120,
+    category: "pants",
+    image: "https://images.unsplash.com/photo-1517423738875-5ce310acd3da?q=80&w=1000&auto=format&fit=crop",
+    description: "Functional cargo pants with multiple pockets and adjustable ankle straps. Crafted from durable nylon blend.",
+    sizes: ["30", "32", "34", "36"]
+  },
+  {
+    id: "4",
+    name: "Memory Beanie",
+    price: 30,
+    category: "accessories",
+    image: "https://images.unsplash.com/photo-1576871333021-d5d2bc33679d?q=80&w=1000&auto=format&fit=crop",
+    description: "Soft knit beanie with embroidered brand division patch. One size fits all.",
+    sizes: ["OS"]
+  },
+  {
+    id: "5",
+    name: "Signature Box Logo Tee",
+    price: 50,
+    category: "t-shirts",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1000&auto=format&fit=crop",
+    description: "Limited edition box logo t-shirt. High-quality screen print on 100% organic cotton.",
+    sizes: ["S", "M", "L", "XL"]
+  },
+  {
+    id: "6",
+    name: "Abstract Graphic Hoodie",
+    price: 95,
+    category: "hoodies",
+    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=1000&auto=format&fit=crop",
+    description: "Hoodie featuring abstract graphic art on the back. Premium brushed interior.",
+    sizes: ["S", "M", "L", "XL"],
+    isNew: true
+  },
+  {
+    id: "7",
+    name: "Division Runner V1",
+    price: 180,
+    category: "shoes",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
+    description: "High-performance urban runner with reactive sole technology and premium mesh upper.",
+    sizes: ["7", "8", "9", "10", "11", "12"],
+    isFeatured: true
+  },
+  {
+    id: "8",
+    name: "Eclipse Sneakers",
+    price: 210,
+    category: "shoes",
+    image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
+    description: "Monochrome leather sneakers with minimalist paneling and custom division sole.",
+    sizes: ["7", "8", "9", "10", "11", "12"],
+    isNew: true
+  },
+  {
+    id: "9",
+    name: "Tech Shell Jacket",
+    price: 250,
+    category: "outerwear",
+    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop",
+    description: "Waterproof tech shell with heat-sealed seams and utilitarian design.",
+    sizes: ["S", "M", "L", "XL"]
+  },
+  {
+    id: "10",
+    name: "Division Tote Bag",
+    price: 65,
+    category: "accessories",
+    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop",
+    description: "Durable canvas tote bag with reinforced handles and interior zip pocket.",
+    sizes: ["OS"]
+  },
+  {
+    id: "11",
+    name: "Phantom Low-Top",
+    price: 195,
+    category: "shoes",
+    image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=1000&auto=format&fit=crop",
+    description: "Sleek low-top silhouette crafted from Italian suede and recycled rubber.",
+    sizes: ["7", "8", "9", "10", "11", "12"]
+  },
+  {
+    id: "12",
+    name: "Core Logo Socks",
+    price: 15,
+    category: "accessories",
+    image: "https://images.unsplash.com/photo-1582966239102-93cc63e030bc?q=80&w=1000&auto=format&fit=crop",
+    description: "Comfortable rib-knit socks with embroidered division logo.",
+    sizes: ["OS"],
+    isNew: true
+  }
 ];
 
 export const collections = [
