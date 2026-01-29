@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { ShoppingBag, Menu, X, Search, Globe, Coins } from "lucide-react";
+import { ShoppingBag, Menu, X, Search, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useSettings } from "@/context/SettingsContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -14,6 +15,7 @@ export const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { totalItems } = useCart();
+  const { wishlist } = useWishlist();
   const { language, setLanguage, currency, setCurrency, t } = useSettings();
   const router = useRouter();
 
@@ -29,8 +31,6 @@ export const Navbar = () => {
     { name: t("nav.shop"), href: "/shop" },
     { name: t("nav.collections"), href: "/collections" },
     { name: t("nav.stores"), href: "/stores" },
-    { name: t("nav.about"), href: "/about" },
-    { name: t("nav.contact"), href: "/contact" },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -42,10 +42,22 @@ export const Navbar = () => {
     }
   };
 
+  const nextLanguage = () => {
+    const langs: ("en" | "es" | "jp")[] = ["en", "es", "jp"];
+    const idx = langs.indexOf(language);
+    setLanguage(langs[(idx + 1) % langs.length]);
+  };
+
+  const nextCurrency = () => {
+    const currs: ("USD" | "EUR" | "JPY")[] = ["USD", "EUR", "JPY"];
+    const idx = currs.indexOf(currency);
+    setCurrency(currs[(idx + 1) % currs.length]);
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-md border-b py-4" : "bg-transparent py-6"
+        isScrolled ? "bg-background/80 backdrop-blur-md border-b py-3" : "bg-transparent py-5"
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
@@ -54,7 +66,7 @@ export const Navbar = () => {
             className="lg:hidden"
             onClick={() => setIsMobileMenuOpen(true)}
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-5 h-5" />
           </button>
           
           <div className="hidden lg:flex items-center gap-6">
@@ -62,7 +74,7 @@ export const Navbar = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-[10px] font-bold tracking-[0.2em] uppercase hover:text-brand transition-colors"
+                className="text-[9px] font-black tracking-[0.3em] uppercase hover:text-brand transition-colors"
               >
                 {link.name}
               </Link>
@@ -75,53 +87,48 @@ export const Navbar = () => {
           href="/"
           className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group"
         >
-          <div className="text-3xl font-black tracking-tighter leading-none group-hover:scale-110 transition-transform">
+          <div className="text-2xl font-black tracking-tighter leading-none group-hover:tracking-[0.1em] transition-all duration-500">
             M
-          </div>
-          <div className="text-[6px] font-bold tracking-[0.4em] uppercase opacity-0 group-hover:opacity-100 transition-opacity mt-1">
-            Division
           </div>
         </Link>
 
-        <div className="flex items-center gap-4 md:gap-6">
-          {/* Settings Selectors */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="flex items-center gap-2 group cursor-pointer relative">
-              <Globe className="w-3.5 h-3.5 text-zinc-400 group-hover:text-foreground transition-colors" />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as any)}
-                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border-none p-0 focus:ring-0"
-              >
-                <option value="en">EN</option>
-                <option value="es">ES</option>
-                <option value="jp">JP</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2 group cursor-pointer relative">
-              <Coins className="w-3.5 h-3.5 text-zinc-400 group-hover:text-foreground transition-colors" />
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as any)}
-                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border-none p-0 focus:ring-0"
-              >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="JPY">JPY</option>
-              </select>
-            </div>
+        <div className="flex items-center gap-5 md:gap-7">
+          {/* Settings - Ultra Minimalist Text Cycle */}
+          <div className="hidden md:flex items-center gap-6">
+            <button 
+              onClick={nextLanguage}
+              className="text-[9px] font-black tracking-[0.2em] uppercase hover:text-brand transition-colors min-w-[20px]"
+            >
+              {language}
+            </button>
+            <button 
+              onClick={nextCurrency}
+              className="text-[9px] font-black tracking-[0.2em] uppercase hover:text-brand transition-colors min-w-[30px]"
+            >
+              {currency}
+            </button>
           </div>
 
           <button 
             onClick={() => setIsSearchOpen(true)}
             className="hover:text-brand transition-colors"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-4 h-4" />
           </button>
+
+          <Link href="/wishlist" className="relative group">
+            <Heart className="w-4 h-4 group-hover:text-brand transition-colors" />
+            {wishlist.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-brand text-white text-[7px] font-black w-3 h-3 rounded-full flex items-center justify-center">
+                {wishlist.length}
+              </span>
+            )}
+          </Link>
+
           <Link href="/cart" className="relative group">
-            <ShoppingBag className="w-5 h-5 group-hover:text-brand transition-colors" />
+            <ShoppingBag className="w-4 h-4 group-hover:text-brand transition-colors" />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-foreground text-background text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-foreground text-background text-[7px] font-black w-3 h-3 rounded-full flex items-center justify-center">
                 {totalItems}
               </span>
             )}

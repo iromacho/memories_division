@@ -75,37 +75,42 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Footer Settings */}
-          <div className="flex items-center gap-12 border-t md:border-t-0 pt-8 md:pt-0 w-full md:w-auto">
-            <div className="flex flex-col gap-2">
-              <span className="text-[8px] text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-2">
-                <Globe className="w-3 h-3" /> Language
-              </span>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as any)}
-                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border-none p-0 focus:ring-0"
-              >
-                <option value="en">English (US)</option>
-                <option value="es">Español (ES)</option>
-                <option value="jp">日本語 (JP)</option>
-              </select>
+            {/* Footer Settings - Minimalist */}
+            <div className="flex items-center gap-10 border-t md:border-t-0 pt-8 md:pt-0 w-full md:w-auto">
+              <div className="flex flex-col gap-3">
+                <span className="text-[7px] text-zinc-500 uppercase tracking-[0.3em] font-black">Language</span>
+                <div className="flex gap-4">
+                  {["en", "es", "jp"].map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setLanguage(lang as any)}
+                      className={`text-[9px] font-black uppercase tracking-widest transition-colors ${
+                        language === lang ? "text-brand" : "text-zinc-400 hover:text-foreground"
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-[7px] text-zinc-500 uppercase tracking-[0.3em] font-black">Currency</span>
+                <div className="flex gap-4">
+                  {["USD", "EUR", "JPY"].map((curr) => (
+                    <button
+                      key={curr}
+                      onClick={() => setCurrency(curr as any)}
+                      className={`text-[9px] font-black uppercase tracking-widest transition-colors ${
+                        currency === curr ? "text-brand" : "text-zinc-400 hover:text-foreground"
+                      }`}
+                    >
+                      {curr}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-[8px] text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-2">
-                <Coins className="w-3 h-3" /> Currency
-              </span>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as any)}
-                className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer border-none p-0 focus:ring-0"
-              >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="JPY">JPY (¥)</option>
-              </select>
-            </div>
-          </div>
+
         </div>
       </div>
     </footer>

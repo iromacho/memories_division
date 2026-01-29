@@ -124,6 +124,44 @@ export const products: Product[] = [
     description: "Comfortable rib-knit socks with embroidered division logo.",
     sizes: ["OS"],
     isNew: true
+  },
+  {
+    id: "13",
+    name: "Urban Explorer Backpack",
+    price: 145,
+    category: "accessories",
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000&auto=format&fit=crop",
+    description: "High-capacity backpack with laptop compartment and waterproof zippers.",
+    sizes: ["OS"],
+    isFeatured: true
+  },
+  {
+    id: "14",
+    name: "Stealth Windbreaker",
+    price: 130,
+    category: "outerwear",
+    image: "https://images.unsplash.com/photo-1504191463004-3675df75a744?q=80&w=1000&auto=format&fit=crop",
+    description: "Lightweight windbreaker with reflective details and adjustable hood.",
+    sizes: ["S", "M", "L", "XL"]
+  },
+  {
+    id: "15",
+    name: "Division High-Top",
+    price: 230,
+    category: "shoes",
+    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1000&auto=format&fit=crop",
+    description: "Classic high-top silhouette with modern materials and custom division hardware.",
+    sizes: ["7", "8", "9", "10", "11", "12"],
+    isNew: true
+  },
+  {
+    id: "16",
+    name: "Midnight Denim Jacket",
+    price: 165,
+    category: "outerwear",
+    image: "https://images.unsplash.com/photo-1576905341939-402d242748d1?q=80&w=1000&auto=format&fit=crop",
+    description: "Distressed black denim jacket with custom metal buttons and interior print.",
+    sizes: ["S", "M", "L", "XL"]
   }
 ];
 
