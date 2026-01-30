@@ -10,6 +10,7 @@ export default function AdminPage() {
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("t-shirts");
   const [image, setImage] = useState("");
+  const [hoverImage, setHoverImage] = useState("");
   const [description, setDescription] = useState("");
   const [sizes, setSizes] = useState("S,M,L,XL");
   const [isNew, setIsNew] = useState(false);
@@ -40,6 +41,7 @@ export default function AdminPage() {
         price: parseFloat(price),
         category,
         image,
+        images: hoverImage ? [hoverImage] : [],
         description,
         sizes: sizes.split(",").map(s => s.trim()),
         is_new: isNew,
@@ -54,6 +56,7 @@ export default function AdminPage() {
       setName("");
       setPrice("");
       setImage("");
+      setHoverImage("");
       setDescription("");
     }
     setIsSubmitting(false);
@@ -155,21 +158,40 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest">Image URL</label>
-            <div className="flex gap-4">
-              <input
-                required
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                placeholder="https://images.unsplash.com/..."
-              />
-              {image && (
-                <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
-                  <img src={image} alt="Preview" className="w-full h-full object-cover" />
-                </div>
-              )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Main Image URL</label>
+              <div className="flex gap-4">
+                <input
+                  required
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                  placeholder="https://images.unsplash.com/..."
+                />
+                {image && (
+                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
+                    <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Hover Image URL (Optional)</label>
+              <div className="flex gap-4">
+                <input
+                  value={hoverImage}
+                  onChange={(e) => setHoverImage(e.target.value)}
+                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                  placeholder="https://images.unsplash.com/..."
+                />
+                {hoverImage && (
+                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
+                    <img src={hoverImage} alt="Hover Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

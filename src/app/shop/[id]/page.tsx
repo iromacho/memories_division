@@ -20,67 +20,96 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const { t, formatPrice } = useSettings();
   const { toggleWishlist, isInWishlist } = useWishlist();
   
-  const [selectedSize, setSelectedSize] = useState("");
-  const [quantity, setQuantity] = useState(1);
+    const [selectedSize, setSelectedSize] = useState("");
+    const [quantity, setQuantity] = useState(1);
+    const [activeImage, setActiveImage] = useState("");
 
-  useEffect(() => {
-    async function loadProduct() {
-      setIsLoading(true);
-      const data = await getProductById(id);
-      setProduct(data);
-      if (data?.sizes?.[0]) setSelectedSize(data.sizes[0]);
-      setIsLoading(false);
+    useEffect(() => {
+      async function loadProduct() {
+        setIsLoading(true);
+        const data = await getProductById(id);
+        setProduct(data);
+        if (data?.sizes?.[0]) setSelectedSize(data.sizes[0]);
+        if (data?.image) setActiveImage(data.image);
+        setIsLoading(false);
+      }
+      loadProduct();
+    }, [id]);
+
+    if (isLoading) {
+      return (
+        <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
+          <div className="w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+        </div>
+      );
     }
-    loadProduct();
-  }, [id]);
 
-  if (isLoading) {
+    if (!product) {
+      notFound();
+    }
+
+    const allImages = [product.image, ...(product.images || [])];
+
+    const handleAddToCart = () => {
+      for (let i = 0; i < quantity; i++) {
+        addToCart(product, selectedSize);
+      }
+    };
+
+    const isLiked = isInWishlist(product.id);
+
     return (
-      <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!product) {
-    notFound();
-  }
-
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product, selectedSize);
-    }
-  };
-
-  const isLiked = isInWishlist(product.id);
-
-  return (
-    <div className="pt-32 pb-24 bg-background">
-      <div className="container mx-auto px-6">
-        <Link
-          href="/shop"
-          className="inline-flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] hover:text-brand transition-colors mb-16 group"
-        >
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          {t("nav.shop")}
-        </Link>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-          {/* Image Gallery */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="relative aspect-[3/4] bg-accent overflow-hidden group"
+      <div className="pt-32 pb-24 bg-background">
+        <div className="container mx-auto px-6">
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] hover:text-brand transition-colors mb-16 group"
           >
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-1000 group-hover:scale-105"
-              priority
-            />
-          </motion.div>
+            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            {t("nav.shop")}
+          </Link>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
+            {/* Image Gallery */}
+            <div className="space-y-6">
+              <motion.div
+                key={activeImage}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative aspect-[3/4] bg-accent overflow-hidden group"
+              >
+                <Image
+                  src={activeImage || product.image}
+                  alt={product.name}
+                  fill
+                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                  priority
+                />
+              </motion.div>
+              
+              {allImages.length > 1 && (
+                <div className="grid grid-cols-4 gap-4">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImage(img)}
+                      className={`relative aspect-[3/4] bg-accent overflow-hidden border-2 transition-all ${
+                        activeImage === img ? "border-brand" : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <Image
+                        src={img}
+                        alt={`${product.name} thumbnail ${idx}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
 
           {/* Product Info */}
           <motion.div

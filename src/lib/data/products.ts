@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   category: string;
   image: string;
+  images?: string[];
   description: string;
   sizes: string[];
   isNew?: boolean;
@@ -40,6 +41,7 @@ export async function getProducts(): Promise<Product[]> {
     price: Number(item.price),
     category: item.category,
     image: item.image,
+    images: item.images || [],
     description: item.description,
     sizes: item.sizes,
     isNew: item.is_new,
@@ -65,6 +67,7 @@ export async function getProductById(id: string): Promise<Product | null> {
     price: Number(data.price),
     category: data.category,
     image: data.image,
+    images: data.images || [],
     description: data.description,
     sizes: data.sizes,
     isNew: data.is_new,
