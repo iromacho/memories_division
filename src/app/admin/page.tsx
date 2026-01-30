@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import { Plus, Trash2, Save, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Save, Image as ImageIcon, Upload, X } from "lucide-react";
 
 export default function AdminPage() {
   const [name, setName] = useState("");
@@ -11,6 +11,10 @@ export default function AdminPage() {
   const [category, setCategory] = useState("t-shirts");
   const [image, setImage] = useState("");
   const [hoverImage, setHoverImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [hoverImageFile, setHoverImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [hoverImagePreview, setHoverImagePreview] = useState("");
   const [description, setDescription] = useState("");
   const [sizes, setSizes] = useState("S,M,L,XL");
   const [isNew, setIsNew] = useState(false);
@@ -19,6 +23,9 @@ export default function AdminPage() {
   const [message, setMessage] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const mainFileRef = useRef<HTMLInputElement>(null);
+  const secondFileRef = useRef<HTMLInputElement>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,37 +36,90 @@ export default function AdminPage() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "main" | "second") => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (type === "main") {
+          setImageFile(file);
+          setImagePreview(reader.result as string);
+          setImage(""); // Clear URL if file is chosen
+        } else {
+          setHoverImageFile(file);
+          setHoverImagePreview(reader.result as string);
+          setHoverImage(""); // Clear URL if file is chosen
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadFile = async (file: File) => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) return;
     setIsSubmitting(true);
     setMessage("");
 
-    const { error } = await supabase.from("products").insert([
-      {
-        name,
-        price: parseFloat(price),
-        category,
-        image,
-        images: hoverImage ? [hoverImage] : [],
-        description,
-        sizes: sizes.split(",").map(s => s.trim()),
-        is_new: isNew,
-        is_featured: isFeatured,
-      },
-    ]);
+    try {
+      let finalImageUrl = image;
+      let finalHoverImageUrl = hoverImage;
 
-    if (error) {
-      setMessage(`Error: ${error.message}`);
-    } else {
+      if (imageFile) {
+        finalImageUrl = await uploadFile(imageFile);
+      }
+
+      if (hoverImageFile) {
+        finalHoverImageUrl = await uploadFile(hoverImageFile);
+      }
+
+      const { error } = await supabase.from("products").insert([
+        {
+          name,
+          price: parseFloat(price),
+          category,
+          image: finalImageUrl,
+          images: finalHoverImageUrl ? [finalHoverImageUrl] : [],
+          description,
+          sizes: sizes.split(",").map(s => s.trim()),
+          is_new: isNew,
+          is_featured: isFeatured,
+        },
+      ]);
+
+      if (error) throw error;
+
       setMessage("Product added successfully!");
       setName("");
       setPrice("");
       setImage("");
       setHoverImage("");
+      setImageFile(null);
+      setHoverImageFile(null);
+      setImagePreview("");
+      setHoverImagePreview("");
       setDescription("");
+    } catch (error: any) {
+      setMessage(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (!isAuthenticated) {
@@ -159,38 +219,107 @@ export default function AdminPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Main Image */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Main Image URL</label>
-              <div className="flex gap-4">
+              <label className="text-[10px] font-black uppercase tracking-widest">Main Image</label>
+              <div className="space-y-4">
                 <input
-                  required
                   value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                  placeholder="https://images.unsplash.com/..."
+                  onChange={(e) => {
+                    setImage(e.target.value);
+                    setImageFile(null);
+                    setImagePreview("");
+                  }}
+                  className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                  placeholder="Paste URL..."
+                  disabled={!!imageFile}
                 />
-                {image && (
-                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
-                    <img src={image} alt="Preview" className="w-full h-full object-cover" />
-                  </div>
-                )}
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => mainFileRef.current?.click()}
+                    className="flex-1 border border-dashed border-accent py-3 flex items-center justify-center gap-2 hover:border-brand transition-colors text-[10px] uppercase font-black tracking-widest"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {imageFile ? "Change File" : "Upload File"}
+                  </button>
+                  {imageFile && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview("");
+                      }}
+                      className="p-3 border border-accent hover:border-red-500 hover:text-red-500 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  <input
+                    type="file"
+                    ref={mainFileRef}
+                    onChange={(e) => handleFileChange(e, "main")}
+                    className="hidden"
+                    accept="image/*"
+                  />
+                  {(imagePreview || image) && (
+                    <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white shrink-0">
+                      <img src={imagePreview || image} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
+            {/* Second Image */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Hover Image URL (Optional)</label>
-              <div className="flex gap-4">
+              <label className="text-[10px] font-black uppercase tracking-widest">Segunda imagen (Opcional)</label>
+              <div className="space-y-4">
                 <input
                   value={hoverImage}
-                  onChange={(e) => setHoverImage(e.target.value)}
-                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                  placeholder="https://images.unsplash.com/..."
+                  onChange={(e) => {
+                    setHoverImage(e.target.value);
+                    setHoverImageFile(null);
+                    setHoverImagePreview("");
+                  }}
+                  className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                  placeholder="Paste URL..."
+                  disabled={!!hoverImageFile}
                 />
-                {hoverImage && (
-                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
-                    <img src={hoverImage} alt="Hover Preview" className="w-full h-full object-cover" />
-                  </div>
-                )}
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => secondFileRef.current?.click()}
+                    className="flex-1 border border-dashed border-accent py-3 flex items-center justify-center gap-2 hover:border-brand transition-colors text-[10px] uppercase font-black tracking-widest"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {hoverImageFile ? "Change File" : "Upload File"}
+                  </button>
+                  {hoverImageFile && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHoverImageFile(null);
+                        setHoverImagePreview("");
+                      }}
+                      className="p-3 border border-accent hover:border-red-500 hover:text-red-500 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  <input
+                    type="file"
+                    ref={secondFileRef}
+                    onChange={(e) => handleFileChange(e, "second")}
+                    className="hidden"
+                    accept="image/*"
+                  />
+                  {(hoverImagePreview || hoverImage) && (
+                    <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white shrink-0">
+                      <img src={hoverImagePreview || hoverImage} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
