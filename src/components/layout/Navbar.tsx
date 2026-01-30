@@ -19,13 +19,26 @@ export const Navbar = () => {
   const { language, setLanguage, currency, setCurrency, t } = useSettings();
   const router = useRouter();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    useEffect(() => {
+      const handleScroll = () => {
+        if (isMobileMenuOpen || isSearchOpen) return;
+        setIsScrolled(window.scrollY > 50);
+      };
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, [isMobileMenuOpen, isSearchOpen]);
+
+    useEffect(() => {
+      if (isMobileMenuOpen || isSearchOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }, [isMobileMenuOpen, isSearchOpen]);
 
   const navLinks = [
     { name: t("nav.shop"), href: "/shop" },
@@ -55,86 +68,88 @@ export const Navbar = () => {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-md border-b py-3" : "bg-transparent py-5"
-      }`}
-    >
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <button
-            className="lg:hidden"
-            onClick={() => setIsMobileMenuOpen(true)}
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? "bg-background/80 backdrop-blur-md border-b py-3" : "bg-transparent py-5"
+        }`}
+      >
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <button
+              className="lg:hidden"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            
+            <div className="hidden lg:flex items-center gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-[9px] font-black tracking-[0.3em] uppercase hover:text-brand transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Minimalist M Logo */}
+          <Link
+            href="/"
+            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group"
           >
-            <Menu className="w-5 h-5" />
-          </button>
-          
-          <div className="hidden lg:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-[9px] font-black tracking-[0.3em] uppercase hover:text-brand transition-colors"
+            <div className="text-2xl font-black tracking-tighter leading-none group-hover:tracking-[0.1em] transition-all duration-500">
+              M
+            </div>
+          </Link>
+
+          <div className="flex items-center gap-5 md:gap-7">
+            {/* Settings - Ultra Minimalist Text Cycle */}
+            <div className="hidden md:flex items-center gap-6">
+              <button 
+                onClick={nextLanguage}
+                className="text-[9px] font-black tracking-[0.2em] uppercase hover:text-brand transition-colors min-w-[20px]"
               >
-                {link.name}
-              </Link>
-            ))}
+                {language}
+              </button>
+              <button 
+                onClick={nextCurrency}
+                className="text-[9px] font-black tracking-[0.2em] uppercase hover:text-brand transition-colors min-w-[30px]"
+              >
+                {currency}
+              </button>
+            </div>
+
+            <button 
+              onClick={() => setIsSearchOpen(true)}
+              className="hover:text-brand transition-colors"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+
+            <Link href="/wishlist" className="relative group">
+              <Heart className="w-4 h-4 group-hover:text-brand transition-colors" />
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-brand text-white text-[7px] font-black w-3 h-3 rounded-full flex items-center justify-center">
+                  {wishlist.length}
+                </span>
+              )}
+            </Link>
+
+            <Link href="/cart" className="relative group">
+              <ShoppingBag className="w-4 h-4 group-hover:text-brand transition-colors" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-foreground text-background text-[7px] font-black w-3 h-3 rounded-full flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
-
-        {/* Minimalist M Logo */}
-        <Link
-          href="/"
-          className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group"
-        >
-          <div className="text-2xl font-black tracking-tighter leading-none group-hover:tracking-[0.1em] transition-all duration-500">
-            M
-          </div>
-        </Link>
-
-        <div className="flex items-center gap-5 md:gap-7">
-          {/* Settings - Ultra Minimalist Text Cycle */}
-          <div className="hidden md:flex items-center gap-6">
-            <button 
-              onClick={nextLanguage}
-              className="text-[9px] font-black tracking-[0.2em] uppercase hover:text-brand transition-colors min-w-[20px]"
-            >
-              {language}
-            </button>
-            <button 
-              onClick={nextCurrency}
-              className="text-[9px] font-black tracking-[0.2em] uppercase hover:text-brand transition-colors min-w-[30px]"
-            >
-              {currency}
-            </button>
-          </div>
-
-          <button 
-            onClick={() => setIsSearchOpen(true)}
-            className="hover:text-brand transition-colors"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-
-          <Link href="/wishlist" className="relative group">
-            <Heart className="w-4 h-4 group-hover:text-brand transition-colors" />
-            {wishlist.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-brand text-white text-[7px] font-black w-3 h-3 rounded-full flex items-center justify-center">
-                {wishlist.length}
-              </span>
-            )}
-          </Link>
-
-          <Link href="/cart" className="relative group">
-            <ShoppingBag className="w-4 h-4 group-hover:text-brand transition-colors" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-foreground text-background text-[7px] font-black w-3 h-3 rounded-full flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-        </div>
-      </div>
+      </nav>
 
       {/* Search Overlay */}
       <AnimatePresence>
@@ -143,7 +158,7 @@ export const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 bg-background/95 backdrop-blur-xl z-[70] flex flex-col items-center justify-center p-6"
+            className="fixed inset-0 bg-background/95 backdrop-blur-xl z-[70] flex flex-col items-center justify-center p-6 touch-none"
           >
             <button 
               onClick={() => setIsSearchOpen(false)}
@@ -184,7 +199,7 @@ export const Navbar = () => {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 bg-background z-[60] lg:hidden"
+            className="fixed inset-0 bg-background z-[60] lg:hidden touch-none"
           >
             <div className="p-6 flex flex-col h-full">
               <div className="flex items-center justify-between mb-12">
@@ -246,6 +261,6 @@ export const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 };
