@@ -3,172 +3,180 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import { Save, Trash2, Plus, List } from "lucide-react";
 
 type Product = {
-  id: number;
+  id?: number;
   name: string;
   price: number;
   category: string;
+  description: string;
   image: string;
   images: string[];
-  description: string;
   sizes: string[];
   is_new: boolean;
   is_featured: boolean;
 };
 
-type View = "add" | "manage";
-
 export default function AdminPage() {
-  const [view, setView] = useState<View>("manage");
+  const [view, setView] = useState<"add" | "edit">("add");
   const [products, setProducts] = useState<Product[]>([]);
-  const [message, setMessage] = useState("");
+  const [product, setProduct] = useState<Product>({
+    name: "",
+    price: 0,
+    category: "t-shirts",
+    description: "",
+    image: "",
+    images: [],
+    sizes: ["S", "M", "L", "XL"],
+    is_new: false,
+    is_featured: false,
+  });
+
   const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [auth, setAuth] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // 🔐 LOGIN
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === "memories2026") {
-      setIsAuthenticated(true);
-    } else {
-      setMessage("Invalid password");
-    }
-  };
-
-  // 📦 FETCH PRODUCTS
-  const fetchProducts = async () => {
-    const { data } = await supabase.from("products").select("*").order("id", { ascending: false });
-    if (data) setProducts(data);
-  };
-
-  useEffect(() => {
-    if (isAuthenticated) fetchProducts();
-  }, [isAuthenticated]);
-
-  // 🗑️ DELETE
-  const deleteProduct = async (id: number) => {
-    if (!confirm("Delete this product?")) return;
-    await supabase.from("products").delete().eq("id", id);
-    fetchProducts();
-  };
-
-  // 💾 UPDATE
-  const updateProduct = async (product: Product) => {
-    const { error } = await supabase.from("products").update({
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      image: product.image,
-      images: product.images,
-      description: product.description,
-      sizes: product.sizes,
-      is_new: product.is_new,
-      is_featured: product.is_featured,
-    }).eq("id", product.id);
-
-    if (!error) {
-      setMessage("Product updated");
-      fetchProducts();
-    }
-  };
-
-  // 🔒 LOGIN SCREEN
-  if (!isAuthenticated) {
+  /* 🔐 LOGIN */
+  if (!auth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <form onSubmit={handleLogin} className="border border-accent p-8 bg-accent/30 space-y-6 w-full max-w-sm">
-          <h1 className="text-3xl font-black uppercase text-center">Admin Access</h1>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            password === "memories2026"
+              ? setAuth(true)
+              : setMessage("Contraseña incorrecta");
+          }}
+          className="border border-accent p-10 bg-accent/30 space-y-6 w-full max-w-sm text-center"
+        >
+          <h1 className="text-3xl font-black uppercase">Admin</h1>
           <input
             type="password"
-            required
+            placeholder="Contraseña"
+            className="w-full bg-background border border-accent px-4 py-3 text-center"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-background border border-accent px-4 py-3 text-center"
-            placeholder="Password"
           />
-          <button className="w-full bg-foreground text-background py-4 font-black uppercase tracking-widest">
-            Unlock
+          <button className="w-full bg-foreground text-background py-4 font-black uppercase">
+            Entrar
           </button>
-          {message && <p className="text-center text-red-500 text-xs font-black uppercase">{message}</p>}
+          {message && <p className="text-red-500 text-xs">{message}</p>}
         </form>
       </div>
     );
   }
 
-  // 🧠 ADMIN PANEL
+  /* 📦 FETCH PRODUCTS */
+  const loadProducts = async () => {
+    const { data } = await supabase.from("products").select("*").order("id", { ascending: false });
+    if (data) setProducts(data);
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  /* 🖼️ UPLOAD IMAGE */
+  const uploadImage = async (file: File) => {
+    const fileName = `${Date.now()}-${file.name}`;
+    const { data, error } = await supabase.storage
+      .from("products")
+      .upload(fileName, file);
+
+    if (error) return "";
+
+    return supabase.storage.from("products").getPublicUrl(data.path).data.publicUrl;
+  };
+
+  /* ➕ ADD PRODUCT */
+  const addProduct = async () => {
+    const { error } = await supabase.from("products").insert([product]);
+    if (!error) {
+      setMessage("Producto añadido");
+      setProduct({
+        name: "",
+        price: 0,
+        category: "t-shirts",
+        description: "",
+        image: "",
+        images: [],
+        sizes: ["S", "M", "L", "XL"],
+        is_new: false,
+        is_featured: false,
+      });
+      loadProducts();
+    }
+  };
+
+  /* ✏️ UPDATE */
+  const updateProduct = async (p: Product) => {
+    await supabase.from("products").update(p).eq("id", p.id);
+    setMessage("Producto actualizado");
+    loadProducts();
+  };
+
+  /* 🗑️ DELETE */
+  const deleteProduct = async (id?: number) => {
+    if (!id || !confirm("¿Eliminar producto?")) return;
+    await supabase.from("products").delete().eq("id", id);
+    loadProducts();
+  };
+
   return (
     <div className="pt-32 pb-24 min-h-screen bg-background">
-      <div className="container mx-auto px-6 max-w-6xl space-y-16">
+      <div className="max-w-3xl mx-auto px-6 space-y-16">
 
-        {/* HEADER */}
-        <header className="flex flex-col md:flex-row justify-between gap-6">
-          <div>
-            <h1 className="text-4xl font-black uppercase">Admin Panel</h1>
-            <p className="text-zinc-500 text-xs uppercase tracking-widest">
-              Manage store content
-            </p>
-          </div>
+        {/* MENU */}
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => setView("add")}
+            className={`px-6 py-3 border font-black uppercase ${
+              view === "add" ? "bg-foreground text-background" : "border-accent"
+            }`}
+          >
+            Añadir producto
+          </button>
+          <button
+            onClick={() => setView("edit")}
+            className={`px-6 py-3 border font-black uppercase ${
+              view === "edit" ? "bg-foreground text-background" : "border-accent"
+            }`}
+          >
+            Editar productos
+          </button>
+        </div>
 
-          {/* MENU */}
-          <div className="flex gap-4">
-            <button
-              onClick={() => setView("add")}
-              className={`flex items-center gap-2 px-5 py-3 border font-black uppercase text-xs tracking-widest ${
-                view === "add" ? "bg-foreground text-background" : "border-accent"
-              }`}
-            >
-              <Plus className="w-4 h-4" /> Add product
-            </button>
-
-            <button
-              onClick={() => setView("manage")}
-              className={`flex items-center gap-2 px-5 py-3 border font-black uppercase text-xs tracking-widest ${
-                view === "manage" ? "bg-foreground text-background" : "border-accent"
-              }`}
-            >
-              <List className="w-4 h-4" /> Manage products
-            </button>
-          </div>
-        </header>
-
-        {/* MANAGE PRODUCTS */}
-        {view === "manage" && (
+        {/* ➕ ADD PRODUCT */}
+        {view === "add" && (
           <section className="space-y-6">
-            {products.map((p) => (
+            <input placeholder="Nombre" className="input" value={product.name} onChange={e => setProduct({ ...product, name: e.target.value })} />
+            <input type="number" placeholder="Precio" className="input" value={product.price} onChange={e => setProduct({ ...product, price: Number(e.target.value) })} />
+            <textarea placeholder="Descripción" className="input h-32" value={product.description} onChange={e => setProduct({ ...product, description: e.target.value })} />
+
+            <input type="file" onChange={async e => {
+              if (e.target.files?.[0]) {
+                const url = await uploadImage(e.target.files[0]);
+                setProduct({ ...product, image: url });
+              }
+            }} />
+
+            <button onClick={addProduct} className="w-full bg-foreground text-background py-4 font-black uppercase">
+              Guardar producto
+            </button>
+          </section>
+        )}
+
+        {/* ✏️ EDIT */}
+        {view === "edit" && (
+          <section className="space-y-8">
+            {products.map(p => (
               <div key={p.id} className="border border-accent p-6 space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <input value={p.name} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, name: e.target.value } : x))} className="input" />
-                  <input type="number" value={p.price} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, price: Number(e.target.value) } : x))} className="input" />
-                  <input value={p.category} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, category: e.target.value } : x))} className="input" />
-                </div>
+                <input className="input" value={p.name} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, name: e.target.value } : x))} />
+                <input type="number" className="input" value={p.price} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, price: Number(e.target.value) } : x))} />
 
-                <input value={p.image} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, image: e.target.value } : x))} className="input" placeholder="Main image URL" />
-                <input value={p.images?.[0] || ""} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, images: [e.target.value] } : x))} className="input" placeholder="Hover image URL" />
-
-                <textarea value={p.description} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, description: e.target.value } : x))} className="input h-28" />
-
-                <input value={p.sizes.join(", ")} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, sizes: e.target.value.split(",").map(s => s.trim()) } : x))} className="input" />
-
-                <div className="flex gap-6">
-                  <label className="flex gap-2 items-center text-xs uppercase font-black">
-                    <input type="checkbox" checked={p.is_new} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, is_new: e.target.checked } : x))} />
-                    New
-                  </label>
-                  <label className="flex gap-2 items-center text-xs uppercase font-black">
-                    <input type="checkbox" checked={p.is_featured} onChange={(e) => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, is_featured: e.target.checked } : x))} />
-                    Featured
-                  </label>
-                </div>
-
-                <div className="flex justify-between">
-                  <button onClick={() => updateProduct(p)} className="btn-primary">
-                    <Save className="w-4 h-4" /> Save
-                  </button>
-                  <button onClick={() => deleteProduct(p.id)} className="btn-danger">
-                    <Trash2 className="w-4 h-4" /> Delete
-                  </button>
+                <div className="flex gap-4">
+                  <button onClick={() => updateProduct(p)} className="btn-primary">Guardar</button>
+                  <button onClick={() => deleteProduct(p.id)} className="btn-danger">Eliminar</button>
                 </div>
               </div>
             ))}
@@ -176,7 +184,7 @@ export default function AdminPage() {
         )}
 
         {message && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-green-500 text-xs font-black uppercase tracking-widest">
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-xs font-black uppercase">
             {message}
           </motion.p>
         )}
