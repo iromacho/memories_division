@@ -1,25 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import { Plus, Trash2, Save, Image as ImageIcon } from "lucide-react";
+import { Trash2, Save } from "lucide-react";
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+};
 
 export default function AdminPage() {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("t-shirts");
-  const [image, setImage] = useState("");
-  const [hoverImage, setHoverImage] = useState("");
-  const [description, setDescription] = useState("");
-  const [sizes, setSizes] = useState("S,M,L,XL");
-  const [isNew, setIsNew] = useState(false);
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [message, setMessage] = useState("");
 
+  // 🔐 Login simple
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === "memories2026") {
@@ -29,230 +28,182 @@ export default function AdminPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isAuthenticated) return;
-    setIsSubmitting(true);
-    setMessage("");
+  // 📦 Cargar productos
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, name, price, category")
+      .order("id", { ascending: false });
 
-    const { error } = await supabase.from("products").insert([
-      {
-        name,
-        price: parseFloat(price),
-        category,
-        image,
-        images: hoverImage ? [hoverImage] : [],
-        description,
-        sizes: sizes.split(",").map(s => s.trim()),
-        is_new: isNew,
-        is_featured: isFeatured,
-      },
-    ]);
-
-    if (error) {
-      setMessage(`Error: ${error.message}`);
-    } else {
-      setMessage("Product added successfully!");
-      setName("");
-      setPrice("");
-      setImage("");
-      setHoverImage("");
-      setDescription("");
+    if (!error && data) {
+      setProducts(data);
     }
-    setIsSubmitting(false);
   };
 
+  // 🗑️ Eliminar producto
+  const deleteProduct = async (id: number) => {
+    const confirmDelete = confirm("Delete this product?");
+    if (!confirmDelete) return;
+
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (!error) fetchProducts();
+  };
+
+  // 💾 Actualizar producto (nombre + precio)
+  const updateProduct = async (product: Product) => {
+    const { error } = await supabase
+      .from("products")
+      .update({
+        name: product.name,
+        price: product.price,
+        category: product.category,
+      })
+      .eq("id", product.id);
+
+    if (!error) {
+      setMessage("Product updated");
+      fetchProducts();
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) fetchProducts();
+  }, [isAuthenticated]);
+
+  // 🔒 LOGIN SCREEN
   if (!isAuthenticated) {
     return (
-      <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
-        <div className="w-full max-w-md px-6">
-          <header className="mb-12 text-center">
-            <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Admin Access</h1>
-            <p className="text-zinc-500 uppercase tracking-widest text-[10px]">Enter password to continue</p>
-          </header>
-          <form onSubmit={handleLogin} className="space-y-6 bg-accent/30 p-8 border border-accent">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Password</label>
-              <input
-                required
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors text-center"
-                placeholder="••••••••"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-foreground text-background font-black uppercase tracking-[0.3em] py-5 hover:bg-brand transition-colors"
-            >
-              Unlock
-            </button>
-            {message && (
-              <p className="text-center font-black uppercase tracking-widest text-[10px] text-red-500">
-                {message}
-              </p>
-            )}
-          </form>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <form
+          onSubmit={handleLogin}
+          className="border border-accent p-8 bg-accent/30 space-y-6 w-full max-w-sm"
+        >
+          <h1 className="text-3xl font-black uppercase tracking-tight text-center">
+            Admin Access
+          </h1>
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full bg-background border border-accent px-4 py-3 text-center"
+          />
+          <button className="w-full bg-foreground text-background py-4 font-black uppercase tracking-widest">
+            Unlock
+          </button>
+          {message && (
+            <p className="text-center text-red-500 text-xs font-black uppercase">
+              {message}
+            </p>
+          )}
+        </form>
       </div>
     );
   }
 
+  // 🧠 ADMIN PANEL
   return (
-
     <div className="pt-32 pb-24 min-h-screen bg-background">
-      <div className="container mx-auto px-6 max-w-4xl">
-        <header className="mb-12">
-          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Admin Dashboard</h1>
-          <p className="text-zinc-500 uppercase tracking-widest text-[10px]">Add new items to the shop</p>
+      <div className="container mx-auto px-6 max-w-5xl space-y-16">
+        <header>
+          <h1 className="text-4xl font-black uppercase tracking-tight mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-zinc-500 text-xs uppercase tracking-widest">
+            Manage products
+          </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="space-y-8 bg-accent/30 p-8 border border-accent">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Product Name</label>
-              <input
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                placeholder="e.g. Division Hoodie"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Price ($)</label>
-              <input
-                required
-                type="number"
-                step="0.01"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                placeholder="0.00"
-              />
-            </div>
-          </div>
+        {/* 🧾 PRODUCT LIST */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-black uppercase tracking-tight">
+            Products
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Category</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors appearance-none"
+          <div className="border border-accent divide-y divide-accent">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 items-center"
               >
-                {["t-shirts", "hoodies", "pants", "shoes", "outerwear", "accessories"].map(cat => (
-                  <option key={cat} value={cat}>{cat.toUpperCase()}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Sizes (comma separated)</label>
-              <input
-                value={sizes}
-                onChange={(e) => setSizes(e.target.value)}
-                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                placeholder="S, M, L, XL"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">Main Image URL</label>
-              <div className="flex gap-4">
                 <input
-                  required
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                  placeholder="https://images.unsplash.com/..."
+                  value={product.name}
+                  onChange={(e) =>
+                    setProducts((prev) =>
+                      prev.map((p) =>
+                        p.id === product.id
+                          ? { ...p, name: e.target.value }
+                          : p
+                      )
+                    )
+                  }
+                  className="bg-background border border-accent px-3 py-2"
                 />
-                {image && (
-                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
-                    <img src={image} alt="Preview" className="w-full h-full object-cover" />
-                  </div>
-                )}
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest">2nd Image (Optional)</label>
-              <div className="flex gap-4">
                 <input
-                  value={hoverImage}
-                  onChange={(e) => setHoverImage(e.target.value)}
-                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
-                  placeholder="https://images.unsplash.com/..."
+                  type="number"
+                  value={product.price}
+                  onChange={(e) =>
+                    setProducts((prev) =>
+                      prev.map((p) =>
+                        p.id === product.id
+                          ? { ...p, price: Number(e.target.value) }
+                          : p
+                      )
+                    )
+                  }
+                  className="bg-background border border-accent px-3 py-2"
                 />
-                {hoverImage && (
-                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
-                    <img src={hoverImage} alt="Hover Preview" className="w-full h-full object-cover" />
-                  </div>
-                )}
+
+                <input
+                  value={product.category}
+                  onChange={(e) =>
+                    setProducts((prev) =>
+                      prev.map((p) =>
+                        p.id === product.id
+                          ? { ...p, category: e.target.value }
+                          : p
+                      )
+                    )
+                  }
+                  className="bg-background border border-accent px-3 py-2"
+                />
+
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => updateProduct(product)}
+                    className="border border-accent px-3 py-2 hover:bg-brand"
+                  >
+                    <Save className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => deleteProduct(product.id)}
+                    className="border border-accent px-3 py-2 hover:bg-red-600"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
+            ))}
+
+            {products.length === 0 && (
+              <p className="p-6 text-center text-zinc-500 text-xs uppercase tracking-widest">
+                No products found
+              </p>
+            )}
           </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest">Description</label>
-            <textarea
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-background border border-accent px-4 py-4 h-32 focus:border-brand outline-none transition-colors resize-none"
-              placeholder="Describe the product..."
-            />
-          </div>
-
-          <div className="flex gap-8">
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={isNew}
-                onChange={(e) => setIsNew(e.target.checked)}
-                className="hidden"
-              />
-              <div className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${isNew ? "bg-brand border-brand" : "border-accent group-hover:border-brand"}`}>
-                {isNew && <div className="w-2 h-2 bg-white" />}
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest">New Arrival</span>
-            </label>
-
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                className="hidden"
-              />
-              <div className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${isFeatured ? "bg-brand border-brand" : "border-accent group-hover:border-brand"}`}>
-                {isFeatured && <div className="w-2 h-2 bg-white" />}
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Featured Item</span>
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-foreground text-background font-black uppercase tracking-[0.3em] py-5 hover:bg-brand transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            {isSubmitting ? "Processing..." : "Add Product"}
-          </button>
 
           {message && (
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`text-center font-black uppercase tracking-widest text-[10px] ${message.includes("Error") ? "text-red-500" : "text-green-500"}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-xs uppercase tracking-widest text-green-500 font-black"
             >
               {message}
             </motion.p>
           )}
-        </form>
+        </section>
       </div>
     </div>
   );
