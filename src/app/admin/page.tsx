@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { motion } from "framer-motion";
 
 type Product = {
   id?: number;
@@ -11,22 +10,20 @@ type Product = {
   category: string;
   description: string;
   image: string;
-  images: string[];
   sizes: string[];
   is_new: boolean;
   is_featured: boolean;
 };
 
 export default function AdminPage() {
-  const [view, setView] = useState<"add" | "edit">("add");
+  const [mode, setMode] = useState<"add" | "edit">("add");
   const [products, setProducts] = useState<Product[]>([]);
-  const [product, setProduct] = useState<Product>({
+  const [form, setForm] = useState<Product>({
     name: "",
     price: 0,
     category: "t-shirts",
     description: "",
     image: "",
-    images: [],
     sizes: ["S", "M", "L", "XL"],
     is_new: false,
     is_featured: false,
@@ -34,9 +31,9 @@ export default function AdminPage() {
 
   const [password, setPassword] = useState("");
   const [auth, setAuth] = useState(false);
-  const [message, setMessage] = useState("");
+  const [msg, setMsg] = useState("");
 
-  /* 🔐 LOGIN */
+  /* LOGIN */
   if (!auth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -45,11 +42,11 @@ export default function AdminPage() {
             e.preventDefault();
             password === "memories2026"
               ? setAuth(true)
-              : setMessage("Contraseña incorrecta");
+              : setMsg("Contraseña incorrecta");
           }}
-          className="border border-accent p-10 bg-accent/30 space-y-6 w-full max-w-sm text-center"
+          className="border border-accent p-8 bg-accent/30 space-y-4 w-full max-w-sm text-center"
         >
-          <h1 className="text-3xl font-black uppercase">Admin</h1>
+          <h1 className="text-2xl font-black uppercase">Admin</h1>
           <input
             type="password"
             placeholder="Contraseña"
@@ -57,16 +54,16 @@ export default function AdminPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button className="w-full bg-foreground text-background py-4 font-black uppercase">
+          <button className="w-full bg-foreground text-background py-3 font-black uppercase">
             Entrar
           </button>
-          {message && <p className="text-red-500 text-xs">{message}</p>}
+          {msg && <p className="text-red-500 text-xs">{msg}</p>}
         </form>
       </div>
     );
   }
 
-  /* 📦 FETCH PRODUCTS */
+  /* FETCH PRODUCTS */
   const loadProducts = async () => {
     const { data } = await supabase.from("products").select("*").order("id", { ascending: false });
     if (data) setProducts(data);
@@ -76,46 +73,30 @@ export default function AdminPage() {
     loadProducts();
   }, []);
 
-  /* 🖼️ UPLOAD IMAGE */
+  /* IMAGE UPLOAD */
   const uploadImage = async (file: File) => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage
-      .from("products")
-      .upload(fileName, file);
-
-    if (error) return "";
-
+    const path = `${Date.now()}-${file.name}`;
+    const { data } = await supabase.storage.from("products").upload(path, file);
+    if (!data) return "";
     return supabase.storage.from("products").getPublicUrl(data.path).data.publicUrl;
   };
 
-  /* ➕ ADD PRODUCT */
+  /* ADD */
   const addProduct = async () => {
-    const { error } = await supabase.from("products").insert([product]);
-    if (!error) {
-      setMessage("Producto añadido");
-      setProduct({
-        name: "",
-        price: 0,
-        category: "t-shirts",
-        description: "",
-        image: "",
-        images: [],
-        sizes: ["S", "M", "L", "XL"],
-        is_new: false,
-        is_featured: false,
-      });
-      loadProducts();
-    }
-  };
-
-  /* ✏️ UPDATE */
-  const updateProduct = async (p: Product) => {
-    await supabase.from("products").update(p).eq("id", p.id);
-    setMessage("Producto actualizado");
+    await supabase.from("products").insert([form]);
+    setMsg("Producto añadido");
+    setForm({ ...form, name: "", price: 0, description: "", image: "" });
     loadProducts();
   };
 
-  /* 🗑️ DELETE */
+  /* UPDATE */
+  const updateProduct = async (p: Product) => {
+    await supabase.from("products").update(p).eq("id", p.id);
+    setMsg("Producto actualizado");
+    loadProducts();
+  };
+
+  /* DELETE */
   const deleteProduct = async (id?: number) => {
     if (!id || !confirm("¿Eliminar producto?")) return;
     await supabase.from("products").delete().eq("id", id);
@@ -124,70 +105,70 @@ export default function AdminPage() {
 
   return (
     <div className="pt-32 pb-24 min-h-screen bg-background">
-      <div className="max-w-3xl mx-auto px-6 space-y-16">
+      <div className="max-w-2xl mx-auto px-6 space-y-12">
 
         {/* MENU */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex justify-center gap-4">
           <button
-            onClick={() => setView("add")}
-            className={`px-6 py-3 border font-black uppercase ${
-              view === "add" ? "bg-foreground text-background" : "border-accent"
+            onClick={() => setMode("add")}
+            className={`px-6 py-2 border font-black uppercase text-xs ${
+              mode === "add" ? "bg-foreground text-background" : "border-accent"
             }`}
           >
             Añadir producto
           </button>
           <button
-            onClick={() => setView("edit")}
-            className={`px-6 py-3 border font-black uppercase ${
-              view === "edit" ? "bg-foreground text-background" : "border-accent"
+            onClick={() => setMode("edit")}
+            className={`px-6 py-2 border font-black uppercase text-xs ${
+              mode === "edit" ? "bg-foreground text-background" : "border-accent"
             }`}
           >
             Editar productos
           </button>
         </div>
 
-        {/* ➕ ADD PRODUCT */}
-        {view === "add" && (
-          <section className="space-y-6">
-            <input placeholder="Nombre" className="input" value={product.name} onChange={e => setProduct({ ...product, name: e.target.value })} />
-            <input type="number" placeholder="Precio" className="input" value={product.price} onChange={e => setProduct({ ...product, price: Number(e.target.value) })} />
-            <textarea placeholder="Descripción" className="input h-32" value={product.description} onChange={e => setProduct({ ...product, description: e.target.value })} />
+        {/* ADD */}
+        {mode === "add" && (
+          <div className="space-y-4 border border-accent p-6">
+            <input className="input" placeholder="Nombre" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <input type="number" className="input" placeholder="Precio" value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })} />
+            <textarea className="input h-28" placeholder="Descripción" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
 
-            <input type="file" onChange={async e => {
-              if (e.target.files?.[0]) {
-                const url = await uploadImage(e.target.files[0]);
-                setProduct({ ...product, image: url });
-              }
-            }} />
+            <input
+              type="file"
+              onChange={async e => {
+                if (e.target.files?.[0]) {
+                  const url = await uploadImage(e.target.files[0]);
+                  setForm({ ...form, image: url });
+                }
+              }}
+            />
 
-            <button onClick={addProduct} className="w-full bg-foreground text-background py-4 font-black uppercase">
+            <button onClick={addProduct} className="w-full bg-foreground text-background py-3 font-black uppercase">
               Guardar producto
             </button>
-          </section>
+          </div>
         )}
 
-        {/* ✏️ EDIT */}
-        {view === "edit" && (
-          <section className="space-y-8">
+        {/* EDIT */}
+        {mode === "edit" && (
+          <div className="space-y-6">
             {products.map(p => (
-              <div key={p.id} className="border border-accent p-6 space-y-4">
+              <div key={p.id} className="border border-accent p-5 space-y-3">
                 <input className="input" value={p.name} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, name: e.target.value } : x))} />
                 <input type="number" className="input" value={p.price} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, price: Number(e.target.value) } : x))} />
+                <textarea className="input h-24" value={p.description} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, description: e.target.value } : x))} />
 
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <button onClick={() => updateProduct(p)} className="btn-primary">Guardar</button>
                   <button onClick={() => deleteProduct(p.id)} className="btn-danger">Eliminar</button>
                 </div>
               </div>
             ))}
-          </section>
+          </div>
         )}
 
-        {message && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-xs font-black uppercase">
-            {message}
-          </motion.p>
-        )}
+        {msg && <p className="text-center text-xs uppercase font-black">{msg}</p>}
       </div>
     </div>
   );
