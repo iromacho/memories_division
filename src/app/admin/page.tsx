@@ -1,174 +1,258 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-
-type Product = {
-  id?: number;
-  name: string;
-  price: number;
-  category: string;
-  description: string;
-  image: string;
-  sizes: string[];
-  is_new: boolean;
-  is_featured: boolean;
-};
+import { motion } from "framer-motion";
+import { Plus, Trash2, Save, Image as ImageIcon } from "lucide-react";
 
 export default function AdminPage() {
-  const [mode, setMode] = useState<"add" | "edit">("add");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [form, setForm] = useState<Product>({
-    name: "",
-    price: 0,
-    category: "t-shirts",
-    description: "",
-    image: "",
-    sizes: ["S", "M", "L", "XL"],
-    is_new: false,
-    is_featured: false,
-  });
-
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("t-shirts");
+  const [image, setImage] = useState("");
+  const [hoverImage, setHoverImage] = useState("");
+  const [description, setDescription] = useState("");
+  const [sizes, setSizes] = useState("S,M,L,XL");
+  const [isNew, setIsNew] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
   const [password, setPassword] = useState("");
-  const [auth, setAuth] = useState(false);
-  const [msg, setMsg] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  /* LOGIN */
-  if (!auth) {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === "memories2026") {
+      setIsAuthenticated(true);
+    } else {
+      setMessage("Invalid password");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) return;
+    setIsSubmitting(true);
+    setMessage("");
+
+    const { error } = await supabase.from("products").insert([
+      {
+        name,
+        price: parseFloat(price),
+        category,
+        image,
+        images: hoverImage ? [hoverImage] : [],
+        description,
+        sizes: sizes.split(",").map(s => s.trim()),
+        is_new: isNew,
+        is_featured: isFeatured,
+      },
+    ]);
+
+    if (error) {
+      setMessage(`Error: ${error.message}`);
+    } else {
+      setMessage("Product added successfully!");
+      setName("");
+      setPrice("");
+      setImage("");
+      setHoverImage("");
+      setDescription("");
+    }
+    setIsSubmitting(false);
+  };
+
+  if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            password === "memories2026"
-              ? setAuth(true)
-              : setMsg("Contraseña incorrecta");
-          }}
-          className="border border-accent p-8 bg-accent/30 space-y-4 w-full max-w-sm text-center"
-        >
-          <h1 className="text-2xl font-black uppercase">Admin</h1>
-          <input
-            type="password"
-            placeholder="Contraseña"
-            className="w-full bg-background border border-accent px-4 py-3 text-center"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button className="w-full bg-foreground text-background py-3 font-black uppercase">
-            Entrar
-          </button>
-          {msg && <p className="text-red-500 text-xs">{msg}</p>}
-        </form>
+      <div className="pt-32 pb-24 min-h-screen bg-background flex items-center justify-center">
+        <div className="w-full max-w-md px-6">
+          <header className="mb-12 text-center">
+            <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Admin Access</h1>
+            <p className="text-zinc-500 uppercase tracking-widest text-[10px]">Enter password to continue</p>
+          </header>
+          <form onSubmit={handleLogin} className="space-y-6 bg-accent/30 p-8 border border-accent">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Password</label>
+              <input
+                required
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors text-center"
+                placeholder="••••••••"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-foreground text-background font-black uppercase tracking-[0.3em] py-5 hover:bg-brand transition-colors"
+            >
+              Unlock
+            </button>
+            {message && (
+              <p className="text-center font-black uppercase tracking-widest text-[10px] text-red-500">
+                {message}
+              </p>
+            )}
+          </form>
+        </div>
       </div>
     );
   }
 
-  /* FETCH PRODUCTS */
-  const loadProducts = async () => {
-    const { data } = await supabase.from("products").select("*").order("id", { ascending: false });
-    if (data) setProducts(data);
-  };
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  /* IMAGE UPLOAD */
-  const uploadImage = async (file: File) => {
-    const path = `${Date.now()}-${file.name}`;
-    const { data } = await supabase.storage.from("products").upload(path, file);
-    if (!data) return "";
-    return supabase.storage.from("products").getPublicUrl(data.path).data.publicUrl;
-  };
-
-  /* ADD */
-  const addProduct = async () => {
-    await supabase.from("products").insert([form]);
-    setMsg("Producto añadido");
-    setForm({ ...form, name: "", price: 0, description: "", image: "" });
-    loadProducts();
-  };
-
-  /* UPDATE */
-  const updateProduct = async (p: Product) => {
-    await supabase.from("products").update(p).eq("id", p.id);
-    setMsg("Producto actualizado");
-    loadProducts();
-  };
-
-  /* DELETE */
-  const deleteProduct = async (id?: number) => {
-    if (!id || !confirm("¿Eliminar producto?")) return;
-    await supabase.from("products").delete().eq("id", id);
-    loadProducts();
-  };
-
   return (
+
     <div className="pt-32 pb-24 min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-6 space-y-12">
+      <div className="container mx-auto px-6 max-w-4xl">
+        <header className="mb-12">
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4">Admin Dashboard</h1>
+          <p className="text-zinc-500 uppercase tracking-widest text-[10px]">Add new items to the shop</p>
+        </header>
 
-        {/* MENU */}
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={() => setMode("add")}
-            className={`px-6 py-2 border font-black uppercase text-xs ${
-              mode === "add" ? "bg-foreground text-background" : "border-accent"
-            }`}
-          >
-            Añadir producto
-          </button>
-          <button
-            onClick={() => setMode("edit")}
-            className={`px-6 py-2 border font-black uppercase text-xs ${
-              mode === "edit" ? "bg-foreground text-background" : "border-accent"
-            }`}
-          >
-            Editar productos
-          </button>
-        </div>
-
-        {/* ADD */}
-        {mode === "add" && (
-          <div className="space-y-4 border border-accent p-6">
-            <input className="input" placeholder="Nombre" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            <input type="number" className="input" placeholder="Precio" value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })} />
-            <textarea className="input h-28" placeholder="Descripción" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-
-            <input
-              type="file"
-              onChange={async e => {
-                if (e.target.files?.[0]) {
-                  const url = await uploadImage(e.target.files[0]);
-                  setForm({ ...form, image: url });
-                }
-              }}
-            />
-
-            <button onClick={addProduct} className="w-full bg-foreground text-background py-3 font-black uppercase">
-              Guardar producto
-            </button>
+        <form onSubmit={handleSubmit} className="space-y-8 bg-accent/30 p-8 border border-accent">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Product Name</label>
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                placeholder="e.g. Division Hoodie"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Price ($)</label>
+              <input
+                required
+                type="number"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                placeholder="0.00"
+              />
+            </div>
           </div>
-        )}
 
-        {/* EDIT */}
-        {mode === "edit" && (
-          <div className="space-y-6">
-            {products.map(p => (
-              <div key={p.id} className="border border-accent p-5 space-y-3">
-                <input className="input" value={p.name} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, name: e.target.value } : x))} />
-                <input type="number" className="input" value={p.price} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, price: Number(e.target.value) } : x))} />
-                <textarea className="input h-24" value={p.description} onChange={e => setProducts(ps => ps.map(x => x.id === p.id ? { ...x, description: e.target.value } : x))} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors appearance-none"
+              >
+                {["t-shirts", "hoodies", "pants", "shoes", "outerwear", "accessories"].map(cat => (
+                  <option key={cat} value={cat}>{cat.toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Sizes (comma separated)</label>
+              <input
+                value={sizes}
+                onChange={(e) => setSizes(e.target.value)}
+                className="w-full bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                placeholder="S, M, L, XL"
+              />
+            </div>
+          </div>
 
-                <div className="flex gap-3">
-                  <button onClick={() => updateProduct(p)} className="btn-primary">Guardar</button>
-                  <button onClick={() => deleteProduct(p.id)} className="btn-danger">Eliminar</button>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">Main Image URL</label>
+              <div className="flex gap-4">
+                <input
+                  required
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                  placeholder="https://images.unsplash.com/..."
+                />
+                {image && (
+                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
+                    <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
 
-        {msg && <p className="text-center text-xs uppercase font-black">{msg}</p>}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest">2nd Image (Optional)</label>
+              <div className="flex gap-4">
+                <input
+                  value={hoverImage}
+                  onChange={(e) => setHoverImage(e.target.value)}
+                  className="flex-1 bg-background border border-accent px-4 py-3 focus:border-brand outline-none transition-colors"
+                  placeholder="https://images.unsplash.com/..."
+                />
+                {hoverImage && (
+                  <div className="w-12 h-12 relative border border-accent overflow-hidden bg-white">
+                    <img src={hoverImage} alt="Hover Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest">Description</label>
+            <textarea
+              required
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full bg-background border border-accent px-4 py-4 h-32 focus:border-brand outline-none transition-colors resize-none"
+              placeholder="Describe the product..."
+            />
+          </div>
+
+          <div className="flex gap-8">
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={isNew}
+                onChange={(e) => setIsNew(e.target.checked)}
+                className="hidden"
+              />
+              <div className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${isNew ? "bg-brand border-brand" : "border-accent group-hover:border-brand"}`}>
+                {isNew && <div className="w-2 h-2 bg-white" />}
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest">New Arrival</span>
+            </label>
+
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+                className="hidden"
+              />
+              <div className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${isFeatured ? "bg-brand border-brand" : "border-accent group-hover:border-brand"}`}>
+                {isFeatured && <div className="w-2 h-2 bg-white" />}
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest">Featured Item</span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-foreground text-background font-black uppercase tracking-[0.3em] py-5 hover:bg-brand transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            {isSubmitting ? "Processing..." : "Add Product"}
+          </button>
+
+          {message && (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`text-center font-black uppercase tracking-widest text-[10px] ${message.includes("Error") ? "text-red-500" : "text-green-500"}`}
+            >
+              {message}
+            </motion.p>
+          )}
+        </form>
       </div>
     </div>
   );
