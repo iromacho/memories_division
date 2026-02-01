@@ -51,7 +51,7 @@ export default function Home() {
               <span className="text-brand">Division</span>
             </h1>
             <p className="text-xl md:text-2xl text-zinc-300 max-w-2xl mb-12 font-medium tracking-wide">
-              Streetwear inspired by moments, curated for the modern individual. Minimalist aesthetics, premium quality.
+              All is in our memories.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
               <Link
