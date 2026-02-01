@@ -101,8 +101,8 @@ export const Navbar = () => {
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group"
           >
-            <div className="text-2xl font-red tracking-tighter leading-none group-hover:tracking-[0.1em] transition-all duration-500">
-              M
+            <div className="text-2xl text-red-900 tracking-tighter leading-none group-hover:tracking-[0.1em] transition-all duration-500 italic">
+              memories division
             </div>
           </Link>
 
