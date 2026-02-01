@@ -76,7 +76,7 @@ export default function Home() {
           transition={{ delay: 1, duration: 1 }}
           className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">Scroll Down</span>
+          <span className="text-red-900 text-[10px] uppercase tracking-[0.3em] text-zinc-500">Scroll Down</span>
           <div className="w-[1px] h-12 bg-zinc-800 relative overflow-hidden">
             <motion.div
               animate={{ y: ["-100%", "100%"] }}
