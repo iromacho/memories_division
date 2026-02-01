@@ -18,7 +18,7 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
-  --brand: #0070f3; /* Electric Blue Accent */
+  --brand: #660000; /* Electric Blue Accent */
   --accent: #f5f5f5;
   --accent-foreground: #0a0a0a;
   --border: #e5e5e5;
@@ -28,7 +28,7 @@
 .dark {
   --background: #0a0a0a;
   --foreground: #ffffff;
-  --brand: #0070f3;
+  --brand: #660000;
   --accent: #1a1a1a;
   --accent-foreground: #ffffff;
   --border: #262626;
