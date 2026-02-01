@@ -110,7 +110,7 @@ export default function Home() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-brand mb-4">Top Rated</h2>
-            <h3 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">Featured Products</h3>
+            <h3 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">Best Sellers</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
