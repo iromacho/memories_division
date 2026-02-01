@@ -87,52 +87,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Featured Collections */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-brand mb-4">Latest Drops</h2>
-              <h3 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">Seasonal Collections</h3>
-            </div>
-            <Link href="/collections" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-brand transition-colors">
-              View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {allCollections.map((collection, idx) => (
-                <motion.div
-                  key={collection.id}
-
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: idx * 0.2 }}
-                viewport={{ once: true }}
-                className="relative h-[600px] group overflow-hidden bg-zinc-900"
-              >
-                <Image
-                  src={collection.image}
-                  alt={collection.name}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                />
-                <div className="absolute inset-0 flex flex-col justify-end p-12 bg-gradient-to-t from-black/80 to-transparent">
-                  <h4 className="text-3xl font-bold text-white uppercase tracking-tighter mb-2">{collection.name}</h4>
-                  <p className="text-zinc-300 mb-6 max-w-xs">{collection.description}</p>
-                  <Link
-                    href={`/collections/${collection.id}`}
-                    className="inline-block text-white font-bold uppercase tracking-widest border-b border-white pb-2 hover:text-brand hover:border-brand transition-colors w-fit"
-                  >
-                    Explore Collection
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Categories Quick Links */}
       <section className="py-12 bg-background border-y border-accent">
         <div className="container mx-auto px-6">
@@ -198,6 +152,52 @@ export default function Home() {
             >
               Shop All Products
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Collections */}
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-6">
+          <div className="flex justify-between items-end mb-16">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-brand mb-4">Latest Drops</h2>
+              <h3 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">Seasonal Collections</h3>
+            </div>
+            <Link href="/collections" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-brand transition-colors">
+              View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {allCollections.map((collection, idx) => (
+                <motion.div
+                  key={collection.id}
+
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: idx * 0.2 }}
+                viewport={{ once: true }}
+                className="relative h-[600px] group overflow-hidden bg-zinc-900"
+              >
+                <Image
+                  src={collection.image}
+                  alt={collection.name}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                />
+                <div className="absolute inset-0 flex flex-col justify-end p-12 bg-gradient-to-t from-black/80 to-transparent">
+                  <h4 className="text-3xl font-bold text-white uppercase tracking-tighter mb-2">{collection.name}</h4>
+                  <p className="text-zinc-300 mb-6 max-w-xs">{collection.description}</p>
+                  <Link
+                    href={`/collections/${collection.id}`}
+                    className="inline-block text-white font-bold uppercase tracking-widest border-b border-white pb-2 hover:text-brand hover:border-brand transition-colors w-fit"
+                  >
+                    Explore Collection
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
