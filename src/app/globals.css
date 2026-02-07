@@ -18,22 +18,22 @@
 }
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --brand: #cc0000;
-  --accent: #0a0a0a;
-  --accent-foreground: #ffffff;
-  --border: #1a1a1a;
+  --background: #ffffff;
+  --foreground: #090909;
+  --brand: #b30000;
+  --accent: #f3f3f3;
+  --accent-foreground: #090909;
+  --border: #d9d9d9;
   --radius: 0px;
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #ffffff;
-  --brand: #cc0000;
-  --accent: #0a0a0a;
-  --accent-foreground: #ffffff;
-  --border: #1a1a1a;
+  --background: #ffffff;
+  --foreground: #090909;
+  --brand: #b30000;
+  --accent: #f3f3f3;
+  --accent-foreground: #090909;
+  --border: #d9d9d9;
 }
 
 @layer base {
@@ -41,7 +41,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-black text-white selection:bg-red-700 selection:text-white antialiased;
+    @apply bg-white text-black selection:bg-red-700 selection:text-white antialiased;
+    background-image: radial-gradient(circle at 12% 12%, rgba(179, 0, 0, 0.08), transparent 32%), radial-gradient(circle at 80% 8%, rgba(0, 0, 0, 0.05), transparent 30%);
   }
 }
 

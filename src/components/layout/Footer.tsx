@@ -4,10 +4,10 @@ import Link from "next/link";
 
 export const Footer = () => {
   return (
-    <footer className="bg-black border-t border-zinc-900 py-10">
+    <footer className="bg-white border-t border-zinc-200 py-10">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center gap-6">
-          <Link href="/" className="font-display text-2xl font-bold italic text-white">
+          <Link href="/" className="font-display text-2xl font-bold italic text-black">
             M<span className="text-red-700">.</span>
           </Link>
 
@@ -16,7 +16,7 @@ export const Footer = () => {
               href="https://www.instagram.com/_memoriesdivision_/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 hover:text-red-600 transition-colors"
+              className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600 hover:text-red-700 transition-colors"
             >
               Instagram
             </a>
@@ -25,13 +25,13 @@ export const Footer = () => {
               href="https://www.tiktok.com/@memories_division"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 hover:text-red-600 transition-colors"
+              className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600 hover:text-red-700 transition-colors"
             >
               TikTok
             </a>
           </div>
 
-          <p className="text-[9px] text-zinc-700 uppercase tracking-[0.3em]">
+          <p className="text-[9px] text-zinc-500 uppercase tracking-[0.3em]">
             &copy; 2025 Memories Division
           </p>
         </div>
