@@ -100,7 +100,7 @@ export default function Home() {
           <div className="mb-12 md:mb-16">
             <span className="text-[10px] uppercase tracking-[0.4em] text-red-700 block mb-3">New Arrivals</span>
             <div className="flex items-end justify-between">
-              <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight italic text-white">Featured</h2>
+              <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight italic text-white">Best Sellers</h2>
               <Link
                 href="/shop"
                 className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-red-600 transition-colors border-b border-zinc-800 pb-1"
