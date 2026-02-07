@@ -68,7 +68,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {allImages.map((img, idx) => (
                 <motion.div
                   key={`${img}-${idx}`}

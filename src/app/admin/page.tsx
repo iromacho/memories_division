@@ -536,6 +536,9 @@ function AddProductForm() {
   };
 
   const inputClass = "w-full bg-black border border-zinc-800 px-4 py-3 focus:border-white outline-none transition-colors text-white text-sm";
+  const previewImage = allImages[0];
+  const previewPrice = Number(price);
+  const previewSizes = sizes.split(",").map(s => s.trim()).filter(Boolean);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
@@ -574,6 +577,42 @@ function AddProductForm() {
       <div className="flex gap-6">
         <Checkbox checked={isNew} onChange={setIsNew} label="New Arrival" />
         <Checkbox checked={isFeatured} onChange={setIsFeatured} label="Featured" />
+      </div>
+
+      <div className="space-y-3 border border-zinc-800 bg-zinc-950 p-4 sm:p-5">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Preview</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="relative aspect-[4/5] overflow-hidden bg-zinc-900 border border-zinc-800">
+            {previewImage ? (
+              <img src={previewImage} alt="Product preview" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[10px] uppercase tracking-widest text-zinc-600 px-4 text-center">
+                Upload an image to preview
+              </div>
+            )}
+            {isNew && (
+              <span className="absolute top-3 left-3 bg-white text-black text-[8px] font-bold uppercase tracking-[0.2em] px-2 py-1">New</span>
+            )}
+          </div>
+          <div className="space-y-3 self-center">
+            <h3 className="text-sm font-bold uppercase tracking-[0.15em] break-words">{name || "Product Name"}</h3>
+            <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em]">{category}</p>
+            <p className="text-lg font-black text-white">{Number.isFinite(previewPrice) ? `$${previewPrice.toFixed(2)}` : "$0.00"}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {previewSizes.length > 0 ? (
+                previewSizes.slice(0, 4).map(size => (
+                  <span key={size} className="text-[8px] text-zinc-300 font-bold border border-zinc-700 px-2 py-1 uppercase">{size}</span>
+                ))
+              ) : (
+                <span className="text-[9px] uppercase tracking-widest text-zinc-600">No sizes</span>
+              )}
+            </div>
+            <p className="text-zinc-500 text-xs leading-relaxed line-clamp-3">{description || "Product description preview"}</p>
+            {isFeatured && (
+              <span className="inline-flex bg-zinc-700 text-white text-[8px] font-bold uppercase px-2 py-1">Featured</span>
+            )}
+          </div>
+        </div>
       </div>
 
       <button
