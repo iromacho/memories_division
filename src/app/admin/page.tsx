@@ -146,68 +146,6 @@ export default function AdminPage() {
   );
 }
 
-function ImageUploader({ onUpload, folder, label }: { onUpload: (url: string) => void; folder: string; label: string }) {
-  const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith("image/")) return;
-    setUploading(true);
-    setPreview(URL.createObjectURL(file));
-    const url = await uploadImage(file, folder);
-    if (url) {
-      onUpload(url);
-    }
-    setUploading(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  };
-
-  return (
-    <div className="space-y-2">
-      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{label}</label>
-      <div
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-zinc-700 hover:border-zinc-500 bg-zinc-950 p-6 text-center cursor-pointer transition-colors relative"
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFile(file);
-          }}
-        />
-        {uploading ? (
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500">Uploading...</span>
-          </div>
-        ) : preview ? (
-          <div className="flex items-center gap-4">
-            <img src={preview} alt="" className="w-16 h-16 object-cover border border-zinc-700" />
-            <span className="text-[10px] uppercase tracking-widest text-green-500">Uploaded</span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2">
-            <Upload className="w-6 h-6 text-zinc-600" />
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500">Click or drag image</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function ProductsList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
