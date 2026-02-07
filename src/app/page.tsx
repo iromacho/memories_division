@@ -45,7 +45,7 @@ export default function Home() {
   }, [nextImage, heroImages.length]);
 
   return (
-    <div className="flex flex-col bg-black min-h-screen">
+    <div className="flex flex-col bg-white min-h-screen text-black">
       {/* Hero */}
       <section className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
         <AnimatePresence mode="wait">
@@ -64,17 +64,18 @@ export default function Home() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(179,0,0,0.32),transparent_35%)]" />
           </motion.div>
         </AnimatePresence>
 
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6">
-          <span className="text-[10px] uppercase tracking-[0.6em] text-zinc-500 mb-4">Est. 2025</span>
-          <h1 className="font-display text-4xl md:text-6xl text-white font-bold italic tracking-tight">
+          <span className="text-[10px] uppercase tracking-[0.6em] text-zinc-200 mb-4">Est. 2025</span>
+          <h1 className="font-display text-4xl md:text-6xl text-white font-bold italic tracking-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]">
             Memories Division
           </h1>
-          <div className="w-16 h-[2px] bg-red-700 mt-6 mb-4" />
-          <span className="text-[10px] uppercase tracking-[0.5em] text-zinc-500 font-medium">
+          <div className="w-16 h-[2px] bg-red-800 mt-6 mb-4" />
+          <span className="text-[10px] uppercase tracking-[0.5em] text-zinc-200 font-medium">
             Premium Streetwear
           </span>
         </div>
@@ -86,7 +87,7 @@ export default function Home() {
                 key={i}
                 onClick={() => setCurrentImageIndex(i)}
                 className={`w-8 h-[2px] transition-all duration-500 ${
-                  i === currentImageIndex ? "bg-red-700" : "bg-white/20"
+                  i === currentImageIndex ? "bg-red-700" : "bg-white/40"
                 }`}
               />
             ))}
@@ -95,15 +96,15 @@ export default function Home() {
       </section>
 
       {/* Featured / New Products */}
-      <section className="py-16 md:py-24 bg-black">
+      <section className="py-16 md:py-24 bg-white border-y border-zinc-200">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <div className="mb-12 md:mb-16">
             <span className="text-[10px] uppercase tracking-[0.4em] text-red-700 block mb-3">New Arrivals</span>
             <div className="flex items-end justify-between">
-              <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight italic text-white">Best Sellers</h2>
+              <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight italic text-black">Best Sellers</h2>
               <Link
                 href="/shop"
-                className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-red-600 transition-colors border-b border-zinc-800 pb-1"
+                className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 hover:text-red-700 transition-colors border-b border-zinc-300 pb-1"
               >
                 View All
               </Link>
@@ -120,25 +121,25 @@ export default function Home() {
                 viewport={{ once: true }}
               >
                 <Link href={`/shop/${product.id}`} className="group block">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-zinc-950 mb-3">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100 border border-zinc-200 mb-3">
                     <Image
                       src={product.image}
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300" />
                     {product.isNew && (
-                      <span className="absolute top-2 left-2 bg-red-700 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1">
+                      <span className="absolute top-2 left-2 bg-red-800 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1">
                         New
                       </span>
                     )}
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-white truncate">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-black truncate">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-zinc-600">${product.price}</p>
+                    <p className="text-xs text-zinc-500">${product.price}</p>
                   </div>
                 </Link>
               </motion.div>
@@ -148,10 +149,10 @@ export default function Home() {
       </section>
 
       {/* Brand strip */}
-      <section className="border-t border-zinc-900 py-16 bg-black">
+      <section className="border-t border-zinc-200 py-16 bg-zinc-50">
         <div className="container mx-auto px-6 text-center">
-          <p className="text-[10px] uppercase tracking-[0.6em] text-red-900/60 mb-6">Est. 2025</p>
-          <h2 className="font-display text-5xl md:text-8xl font-bold italic text-white/[0.03] tracking-tight">
+          <p className="text-[10px] uppercase tracking-[0.6em] text-red-800/60 mb-6">Est. 2025</p>
+          <h2 className="font-display text-5xl md:text-8xl font-bold italic text-black/[0.08] tracking-tight">
             Memories Division
           </h2>
         </div>
