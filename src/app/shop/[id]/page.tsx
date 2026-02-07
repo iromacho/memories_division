@@ -22,7 +22,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   
     const [selectedSize, setSelectedSize] = useState("");
     const [quantity, setQuantity] = useState(1);
-    const [activeImage, setActiveImage] = useState("");
 
     useEffect(() => {
       async function loadProduct() {
@@ -30,7 +29,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
         const data = await getProductById(id);
         setProduct(data);
         if (data?.sizes?.[0]) setSelectedSize(data.sizes[0]);
-        if (data?.image) setActiveImage(data.image);
         setIsLoading(false);
       }
       loadProduct();
@@ -70,44 +68,26 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-            {/* Image Gallery */}
             <div className="space-y-6">
-              <motion.div
-                key={activeImage}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="relative aspect-[3/4] bg-accent overflow-hidden group"
-              >
-                <Image
-                  src={activeImage || product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                  priority
-                />
-              </motion.div>
-              
-              {allImages.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
-                  {allImages.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImage(img)}
-                      className={`relative aspect-[3/4] bg-accent overflow-hidden border-2 transition-all ${
-                        activeImage === img ? "border-brand" : "border-transparent opacity-60 hover:opacity-100"
-                      }`}
-                    >
-                      <Image
-                        src={img}
-                        alt={`${product.name} thumbnail ${idx}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
+              {allImages.map((img, idx) => (
+                <motion.div
+                  key={`${img}-${idx}`}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.25 }}
+                  transition={{ duration: 0.7, delay: idx * 0.08 }}
+                  className="relative aspect-[3/4] bg-accent overflow-hidden group border border-zinc-800/40"
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name} image ${idx + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                    priority={idx === 0}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+                </motion.div>
+              ))}
             </div>
 
 
@@ -116,7 +96,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="flex flex-col"
+            className="flex flex-col lg:sticky lg:top-32 self-start h-fit"
           >
             <div className="mb-12">
               <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.4em] mb-4">{product.category}</p>

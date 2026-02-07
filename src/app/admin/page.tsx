@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Save, Image as ImageIcon, Package, X, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2, Save, Image as ImageIcon, Package, X, Upload, Loader2, Pencil } from "lucide-react";
 
 type Tab = "products" | "add-product" | "cover-images";
 
@@ -13,6 +13,9 @@ interface Product {
   price: number;
   category: string;
   image: string;
+  images?: string[];
+  description?: string;
+  sizes?: string[];
   is_new: boolean;
   is_featured: boolean;
   created_at: string;
@@ -23,6 +26,8 @@ interface HeroImage {
   url: string;
   created_at: string;
 }
+
+const CATEGORY_OPTIONS = ["t-shirts", "hoodies", "pants", "shoes", "outerwear", "accessories"];
 
 async function uploadImage(file: File, folder: string): Promise<string | null> {
   const ext = file.name.split(".").pop();
@@ -207,6 +212,7 @@ function ProductsList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -229,6 +235,40 @@ function ProductsList() {
     setDeleting(null);
   }
 
+  async function saveProduct(id: string, payload: {
+    name: string;
+    price: number;
+    category: string;
+    description: string;
+    sizes: string[];
+    allImages: string[];
+    is_new: boolean;
+    is_featured: boolean;
+  }) {
+    const { allImages, ...rest } = payload;
+    const mainImage = allImages[0] || "";
+    const extraImages = allImages.slice(1);
+
+    const { data, error } = await supabase
+      .from("products")
+      .update({
+        ...rest,
+        image: mainImage,
+        images: extraImages,
+      })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    setProducts(prev => prev.map(product => (product.id === id ? (data as Product) : product)));
+    setEditingId(null);
+    return { error: null };
+  }
+
   if (loading) {
     return <div className="text-center py-20 text-zinc-500 text-xs uppercase tracking-widest">Loading products...</div>;
   }
@@ -243,36 +283,191 @@ function ProductsList() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {products.map(product => (
-        <div key={product.id} className="bg-zinc-950 border border-zinc-800 overflow-hidden group">
-          <div className="relative aspect-[3/4] bg-zinc-900">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-            <div className="absolute top-2 right-2 flex gap-1">
-              {product.is_new && (
-                <span className="bg-white text-black text-[8px] font-bold uppercase px-2 py-0.5">New</span>
-              )}
-              {product.is_featured && (
-                <span className="bg-zinc-700 text-white text-[8px] font-bold uppercase px-2 py-0.5">Featured</span>
-              )}
+    <div className="space-y-4">
+      {products.map(product => {
+        const allImages = [product.image, ...(product.images || [])].filter(Boolean);
+        const isEditing = editingId === product.id;
+
+        return (
+          <div key={product.id} className="bg-zinc-950 border border-zinc-800 overflow-hidden">
+            <div className="p-4 sm:p-5 flex items-start justify-between gap-4 border-b border-zinc-800">
+              <div className="flex gap-4 min-w-0">
+                <img src={product.image} alt={product.name} className="w-16 h-20 object-cover border border-zinc-800 shrink-0" />
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold uppercase tracking-wider truncate">{product.name}</h3>
+                  <p className="text-zinc-500 text-xs uppercase tracking-wider mt-1">${product.price} · {product.category}</p>
+                  <div className="flex gap-2 mt-2">
+                    {product.is_new && <span className="bg-white text-black text-[8px] font-bold uppercase px-2 py-0.5">New</span>}
+                    {product.is_featured && <span className="bg-zinc-700 text-white text-[8px] font-bold uppercase px-2 py-0.5">Featured</span>}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setEditingId(isEditing ? null : product.id)}
+                  className="text-zinc-400 hover:text-white transition-colors p-2"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => deleteProduct(product.id)}
+                  disabled={deleting === product.id}
+                  className="text-zinc-600 hover:text-red-500 transition-colors p-2 disabled:opacity-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
+
+            {isEditing && (
+              <ProductEditForm
+                product={product}
+                initialImages={allImages}
+                onCancel={() => setEditingId(null)}
+                onSave={(payload) => saveProduct(product.id, payload)}
+              />
+            )}
           </div>
-          <div className="p-4 flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="text-sm font-bold uppercase tracking-wider truncate">{product.name}</h3>
-              <p className="text-zinc-500 text-xs">${product.price} &middot; {product.category}</p>
-            </div>
-            <button
-              onClick={() => deleteProduct(product.id)}
-              disabled={deleting === product.id}
-              className="text-zinc-600 hover:text-red-500 transition-colors shrink-0 p-1"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
+  );
+}
+
+function ProductEditForm({
+  product,
+  initialImages,
+  onCancel,
+  onSave,
+}: {
+  product: Product;
+  initialImages: string[];
+  onCancel: () => void;
+  onSave: (payload: {
+    name: string;
+    price: number;
+    category: string;
+    description: string;
+    sizes: string[];
+    allImages: string[];
+    is_new: boolean;
+    is_featured: boolean;
+  }) => Promise<{ error: string | null }>;
+}) {
+  const [name, setName] = useState(product.name);
+  const [price, setPrice] = useState(String(product.price));
+  const [category, setCategory] = useState(product.category);
+  const [description, setDescription] = useState(product.description || "");
+  const [sizes, setSizes] = useState((product.sizes || []).join(", "));
+  const [allImages, setAllImages] = useState<string[]>(initialImages);
+  const [isNew, setIsNew] = useState(product.is_new);
+  const [isFeatured, setIsFeatured] = useState(product.is_featured);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const inputClass = "w-full bg-black border border-zinc-800 px-4 py-3 focus:border-white outline-none transition-colors text-white text-sm";
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (allImages.length === 0) {
+      setMessage("Error: Please upload at least one image");
+      return;
+    }
+
+    const parsedPrice = Number(price);
+    if (Number.isNaN(parsedPrice)) {
+      setMessage("Error: Invalid price");
+      return;
+    }
+
+    setSaving(true);
+    setMessage("");
+
+    const result = await onSave({
+      name,
+      price: parsedPrice,
+      category,
+      description,
+      sizes: sizes.split(",").map(s => s.trim()).filter(Boolean),
+      allImages,
+      is_new: isNew,
+      is_featured: isFeatured,
+    });
+
+    if (result.error) {
+      setMessage(`Error: ${result.error}`);
+    } else {
+      setMessage("Product updated");
+    }
+
+    setSaving(false);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Field label="Product Name">
+          <input required value={name} onChange={e => setName(e.target.value)} className={inputClass} />
+        </Field>
+        <Field label="Price ($)">
+          <input required type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} className={inputClass} />
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Field label="Category">
+          <select value={category} onChange={e => setCategory(e.target.value)} className={inputClass + " appearance-none"}>
+            {CATEGORY_OPTIONS.map(cat => (
+              <option key={cat} value={cat}>{cat.toUpperCase()}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Sizes (comma separated)">
+          <input value={sizes} onChange={e => setSizes(e.target.value)} className={inputClass} placeholder="S, M, L, XL" />
+        </Field>
+      </div>
+
+      <MultiImageUploader
+        images={allImages}
+        onAdd={(url) => setAllImages(prev => [...prev, url])}
+        onRemove={(idx) => setAllImages(prev => prev.filter((_, i) => i !== idx))}
+      />
+
+      <Field label="Description">
+        <textarea required value={description} onChange={e => setDescription(e.target.value)} className={inputClass + " h-28 resize-none"} />
+      </Field>
+
+      <div className="flex flex-wrap gap-6">
+        <Checkbox checked={isNew} onChange={setIsNew} label="New Arrival" />
+        <Checkbox checked={isFeatured} onChange={setIsFeatured} label="Featured" />
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          type="submit"
+          disabled={saving}
+          className="sm:flex-1 bg-white text-black font-black uppercase tracking-[0.3em] py-3 hover:bg-zinc-200 transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" />
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="sm:w-40 border border-zinc-700 text-zinc-300 font-black uppercase tracking-[0.3em] py-3 hover:text-white hover:border-zinc-500 transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+
+      {message && (
+        <p className={`font-bold uppercase tracking-widest text-[10px] ${message.includes("Error") ? "text-red-500" : "text-green-500"}`}>
+          {message}
+        </p>
+      )}
+    </form>
   );
 }
 
@@ -418,7 +613,7 @@ function AddProductForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field label="Category">
           <select value={category} onChange={e => setCategory(e.target.value)} className={inputClass + " appearance-none"}>
-            {["t-shirts", "hoodies", "pants", "shoes", "outerwear", "accessories"].map(cat => (
+            {CATEGORY_OPTIONS.map(cat => (
               <option key={cat} value={cat}>{cat.toUpperCase()}</option>
             ))}
           </select>
