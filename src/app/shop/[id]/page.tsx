@@ -10,15 +10,6 @@ import { ChevronLeft, ShoppingBag, Plus, Minus, Info, Truck, RotateCcw, Heart } 
 import { notFound } from "next/navigation";
 import { useSettings } from "@/context/SettingsContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
-const sizeGuideRows = [
-  { size: "XS", chest: "84-88", waist: "68-72", hip: "84-88" },
-  { size: "S", chest: "88-94", waist: "72-78", hip: "88-94" },
-  { size: "M", chest: "94-100", waist: "78-84", hip: "94-100" },
-  { size: "L", chest: "100-106", waist: "84-90", hip: "100-106" },
-  { size: "XL", chest: "106-114", waist: "90-98", hip: "106-114" },
-];
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -116,41 +107,12 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             <div className="mb-12">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-[9px] font-black uppercase tracking-[0.3em]">Select Size</span>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="text-[8px] uppercase tracking-[0.3em] text-zinc-400 border-b border-zinc-400 pb-0.5 hover:text-black hover:border-black transition-colors"
-                    >
-                      Size Guide
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl bg-black border-zinc-800 text-white">
-                    <DialogTitle className="text-sm font-black uppercase tracking-[0.2em]">Size Guide (cm)</DialogTitle>
-                    <div className="border border-zinc-800 overflow-hidden">
-                      <table className="w-full text-left">
-                        <thead className="bg-zinc-900">
-                          <tr>
-                            <th className="px-4 py-3 text-[10px] uppercase tracking-[0.2em]">Size</th>
-                            <th className="px-4 py-3 text-[10px] uppercase tracking-[0.2em]">Chest</th>
-                            <th className="px-4 py-3 text-[10px] uppercase tracking-[0.2em]">Waist</th>
-                            <th className="px-4 py-3 text-[10px] uppercase tracking-[0.2em]">Hip</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sizeGuideRows.map((row) => (
-                            <tr key={row.size} className="border-t border-zinc-800">
-                              <td className="px-4 py-3 text-xs font-bold uppercase tracking-wider">{row.size}</td>
-                              <td className="px-4 py-3 text-xs text-zinc-300">{row.chest}</td>
-                              <td className="px-4 py-3 text-xs text-zinc-300">{row.waist}</td>
-                              <td className="px-4 py-3 text-xs text-zinc-300">{row.hip}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <button
+                  type="button"
+                  className="text-[8px] uppercase tracking-[0.3em] text-zinc-400 border-b border-zinc-400 pb-0.5 hover:text-black hover:border-black transition-colors"
+                >
+                  Size Guide
+                </button>
               </div>
               <div className="flex flex-wrap gap-3">
                 {product.sizes?.map((size) => (
