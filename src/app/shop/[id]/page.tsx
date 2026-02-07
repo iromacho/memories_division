@@ -96,7 +96,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="flex flex-col"
+            className="flex flex-col lg:sticky lg:top-32 self-start h-fit"
           >
             <div className="mb-12">
               <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.4em] mb-4">{product.category}</p>
