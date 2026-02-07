@@ -68,7 +68,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+          <div className="space-y-6">
             {allImages.map((img, idx) => (
               <motion.div
                 key={`${img}-${idx}`}
@@ -83,7 +83,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                   alt={`${product.name} image ${idx + 1}`}
                   fill
                   className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                  priority={idx < 2}
+                  priority={idx === 0}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
               </motion.div>
@@ -107,12 +107,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             <div className="mb-12">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-[9px] font-black uppercase tracking-[0.3em]">Select Size</span>
-                <button
-                  type="button"
-                  className="text-[8px] uppercase tracking-[0.3em] text-zinc-400 border-b border-zinc-400 pb-0.5 hover:text-black hover:border-black transition-colors"
-                >
-                  Size Guide
-                </button>
               </div>
               <div className="flex flex-wrap gap-3">
                 {product.sizes?.map((size) => (
