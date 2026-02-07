@@ -87,3 +87,23 @@ export async function getCollections(): Promise<Collection[]> {
 
   return data;
 }
+
+export interface HeroImage {
+  id: string;
+  url: string;
+  created_at: string;
+}
+
+export async function getHeroImages(): Promise<HeroImage[]> {
+  const { data, error } = await supabase
+    .from('hero_images')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching hero images:', error);
+    return [];
+  }
+
+  return data;
+}
