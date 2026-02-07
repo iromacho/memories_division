@@ -3,10 +3,10 @@
 import { useState, use, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { getProductById, type Product } from "@/lib/data/products";
 import { useCart } from "@/context/CartContext";
-import { ChevronLeft, ShoppingBag, Plus, Minus, Info, Truck, RotateCcw, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingBag, Plus, Minus, Info, Truck, RotateCcw, Heart, X } from "lucide-react";
 import { notFound } from "next/navigation";
 import { useSettings } from "@/context/SettingsContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -22,6 +22,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   
     const [selectedSize, setSelectedSize] = useState("");
     const [quantity, setQuantity] = useState(1);
+    const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
     useEffect(() => {
       async function loadProduct() {
@@ -48,6 +49,8 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
     const allImages = [product.image, ...(product.images || [])];
 
+    const selectedImage = activeImageIndex !== null ? allImages[activeImageIndex] : null;
+
     const handleAddToCart = () => {
       for (let i = 0; i < quantity; i++) {
         addToCart(product, selectedSize);
@@ -68,7 +71,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-8">
               {allImages.map((img, idx) => (
                 <motion.div
                   key={`${img}-${idx}`}
@@ -76,7 +79,8 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.7, delay: idx * 0.08 }}
-                  className="relative aspect-[3/4] bg-accent overflow-hidden group border border-zinc-800/40"
+                  className="relative h-[72vh] min-h-[34rem] md:h-[82vh] md:min-h-[42rem] bg-accent overflow-hidden group border border-zinc-800/40 cursor-zoom-in"
+                  onClick={() => setActiveImageIndex(idx)}
                 >
                   <Image
                     src={img}
@@ -201,6 +205,61 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </div>
           </motion.div>
         </div>
+
+        <AnimatePresence>
+          {selectedImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm"
+            >
+              <button
+                onClick={() => setActiveImageIndex(null)}
+                className="absolute top-6 right-6 z-20 w-12 h-12 border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
+                aria-label="Close image"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev === null ? 0 : (prev - 1 + allImages.length) % allImages.length))}
+                    className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev === null ? 0 : (prev + 1) % allImages.length))}
+                    className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+
+              <div
+                className="absolute inset-0"
+                onClick={() => setActiveImageIndex(null)}
+              />
+
+              <div className="relative z-10 h-full w-full p-6 md:p-16 flex items-center justify-center">
+                <div className="relative w-full h-full max-w-6xl">
+                  <Image
+                    src={selectedImage}
+                    alt={`${product.name} large view`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
