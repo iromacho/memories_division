@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -8,6 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: 'Playfair Display', serif;
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-brand: var(--brand);
@@ -16,22 +18,22 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --brand: #660000; /* Electric Blue Accent */
-  --accent: #f5f5f5;
-  --accent-foreground: #0a0a0a;
-  --border: #e5e5e5;
-  --radius: 0px; /* Streetwear often uses sharp edges or very small radius */
+  --background: #000000;
+  --foreground: #ffffff;
+  --brand: #cc0000;
+  --accent: #0a0a0a;
+  --accent-foreground: #ffffff;
+  --border: #1a1a1a;
+  --radius: 0px;
 }
 
 .dark {
-  --background: #0a0a0a;
+  --background: #000000;
   --foreground: #ffffff;
-  --brand: #660000;
-  --accent: #1a1a1a;
+  --brand: #cc0000;
+  --accent: #0a0a0a;
   --accent-foreground: #ffffff;
-  --border: #262626;
+  --border: #1a1a1a;
 }
 
 @layer base {
@@ -39,7 +41,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground selection:bg-brand selection:text-white antialiased;
+    @apply bg-black text-white selection:bg-red-700 selection:text-white antialiased;
   }
 }
 
@@ -54,5 +56,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .font-display {
+    font-family: var(--font-display);
+  }
 }
-
