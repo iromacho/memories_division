@@ -42,7 +42,6 @@ export const Navbar = () => {
   const navLinks = [
     { name: t("nav.shop"), href: "/shop" },
     { name: t("nav.collections"), href: "/collections" },
-    { name: t("nav.stores"), href: "/stores" },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
